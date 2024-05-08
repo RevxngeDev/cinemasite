@@ -4,17 +4,22 @@ import com.example.cinemasite.models.User;
 import com.example.cinemasite.repositores.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Controller
@@ -27,13 +32,11 @@ public class ProfileController {
     private String storagePath;
 
     @GetMapping("/profile")
-    public String getProfile(Model model, @AuthenticationPrincipal UserDetails userDetails){
+    public String getProfile(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            model.addAttribute("userName", user.getEmail());
-            model.addAttribute("firstName", user.getFirstName());
-            model.addAttribute("lastName", user.getLastName());
+            model.addAttribute("user", user);
         } else {
             return "error";
         }
@@ -42,35 +45,56 @@ public class ProfileController {
     }
 
     @PostMapping("/uploadProfilePicture")
-    public String uploadProfilePicture(@RequestParam("profilePicture") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
-        // Get the user
+    @ResponseBody
+    public ResponseEntity<?> uploadProfilePicture(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-
-            // Check if the file is empty
-            if (file.isEmpty()) {
-                return "redirect:/profile?error=empty"; // Redirect back with error message
-            }
-
-            // Save the file to the file system
-            try {
-                String fileName = userDetails.getUsername() + "_profile.jpg"; // You can use any logic to generate the file name
-                String filePath = storagePath + File.separator + fileName; // Construct the full file path
-                File dest = new File(filePath);
-                file.transferTo(dest);
-
-                // Save the file path to the user profile
-                user.setProfilePicture(fileName);
-                usersRepository.save(user);
-
-                return "redirect:/profile?success=true"; // Redirect back with success message
-            } catch (IOException e) {
-                return "redirect:/profile?error=true"; // Redirect back with error message
+            if (!file.isEmpty()) {
+                try {
+                    String fileName = userDetails.getUsername() + "_profile.jpg";
+                    String filePath = storagePath + File.separator + fileName;
+                    File dest = new File(filePath);
+                    file.transferTo(dest);
+                    user.setProfilePicture(fileName);
+                    usersRepository.save(user);
+                    return ResponseEntity.ok(fileName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+            } else {
+                return ResponseEntity.badRequest().body("File is empty");
             }
         } else {
-            return "redirect:/profile?error=userNotFound"; // Redirect back with error message
+            return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/profile-picture")
+    @ResponseBody
+    public ResponseEntity<Resource> getProfilePicture(@AuthenticationPrincipal UserDetails userDetails) {
+        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            String fileName = user.getProfilePicture();
+            if (fileName != null) {
+                try {
+                    Path path = Paths.get(storagePath, fileName);
+                    Resource resource = new UrlResource(path.toUri());
+                    if (resource.exists() && resource.isReadable()) {
+                        return ResponseEntity.ok()
+                                .contentType(MediaType.IMAGE_JPEG)
+                                .body(resource);
+                    } else {
+                        return ResponseEntity.notFound().build();
+                    }
+                } catch (IOException e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }
