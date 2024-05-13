@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -32,11 +32,14 @@ public class ProfileController {
     private String storagePath;
 
     @GetMapping("/profile")
-    public String getProfile(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+    public String getProfile(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            model.addAttribute("user", user);
+            model.addAttribute("userName", user.getEmail());
+            model.addAttribute("firstName", user.getFirstName());
+            model.addAttribute("lastName", user.getLastName());
+            model.addAttribute("profilePicture", user.getProfilePicture()); // Agrega la imagen al modelo
         } else {
             return "error";
         }
@@ -45,8 +48,7 @@ public class ProfileController {
     }
 
     @PostMapping("/uploadProfilePicture")
-    @ResponseBody
-    public ResponseEntity<?> uploadProfilePicture(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
+    public String uploadProfilePicture(@RequestParam("profilePicture") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
         Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -58,43 +60,34 @@ public class ProfileController {
                     file.transferTo(dest);
                     user.setProfilePicture(fileName);
                     usersRepository.save(user);
-                    return ResponseEntity.ok(fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    // Manejar el error adecuadamente, quizás redirigiendo a una página de error
                 }
-            } else {
-                return ResponseEntity.badRequest().body("File is empty");
             }
+            return "redirect:/profile";
         } else {
+            return "error";
+        }
+    }
+
+    @GetMapping("/profilePicture/{fileName:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String fileName) {
+        Path path = Paths.get(storagePath).resolve(fileName);
+        Resource resource;
+        try {
+            resource = new UrlResource(path.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }
-
-    @GetMapping("/profile-picture")
-    @ResponseBody
-    public ResponseEntity<Resource> getProfilePicture(@AuthenticationPrincipal UserDetails userDetails) {
-        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            String fileName = user.getProfilePicture();
-            if (fileName != null) {
-                try {
-                    Path path = Paths.get(storagePath, fileName);
-                    Resource resource = new UrlResource(path.toUri());
-                    if (resource.exists() && resource.isReadable()) {
-                        return ResponseEntity.ok()
-                                .contentType(MediaType.IMAGE_JPEG)
-                                .body(resource);
-                    } else {
-                        return ResponseEntity.notFound().build();
-                    }
-                } catch (IOException e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                }
-            }
-        }
-        return ResponseEntity.notFound().build();
-    }
-
 }
