@@ -43,6 +43,7 @@
                     <option value="ROMANCE">Romance</option>
                     <option value="ANIMATED">Animated</option>
                     <option value="ACTION">Action</option>
+                    <option value="FANTASY">Fantasy</option>
                 </select>
             </div>
             <div class="form-group">

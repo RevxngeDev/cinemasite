@@ -5,17 +5,22 @@ import com.example.cinemasite.models.Type;
 import com.example.cinemasite.repositores.FilmsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class FilmsController {
@@ -63,4 +68,34 @@ public class FilmsController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+    @GetMapping("/images/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+        try {
+            Path file = Paths.get(storagePath).resolve(filename);
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok().body(resource);
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/films/{id}")
+    public String getFilmPage(@PathVariable Long id, Model model) {
+        Optional<Films> optionalFilm = filmsRepository.findById(id);
+        if (optionalFilm.isPresent()) {
+            Films film = optionalFilm.get();
+            model.addAttribute("film", film);
+            return "filmPage"; // Cambia "filmPage" al nombre de tu plantilla para la página de la película
+        } else {
+            return "redirect:/home"; // O a otra página de error si no se encuentra la película
+        }
+    }
+
+
 }
