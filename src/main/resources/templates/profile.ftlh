@@ -31,17 +31,17 @@
         <!-- Mostrar la imagen -->
         <div class="text-center">
             <#if profilePicture??>
-            <img class="profile-image" src="/profilePicture/${profilePicture}" alt="Profile Picture">
+            <img class="profile-image" id="profilePicture" src="/profilePicture/${profilePicture}" alt="Profile Picture">
             <#else>
-                <p>User has no profile picture. </p>
+                <p>User has no profile picture.</p>
             </#if>
         </div>
-        <form action="/uploadProfilePicture" method="post" enctype="multipart/form-data">
+        <form id="uploadForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="profilePicture">Profile Picture:</label>
-                <input type="file" class="form-control-file" id="profilePicture" name="profilePicture">
+                <input type="file" class="form-control-file" id="fileInput" name="file">
             </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
+            <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
         </form>
         <hr>
         <form>
@@ -64,8 +64,34 @@
 </div>
 
 <!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#uploadButton").click(function () {
+            var formData = new FormData();
+            var file = $("#fileInput")[0].files[0];
+            formData.append("file", file);
+            $.ajax({
+                url: "/uploadProfilePicture",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.status === "success") {
+                        $("#profilePicture").attr("src", "/profilePicture/" + data.fileName);
+                    } else {
+                        console.error("Error: " + data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al enviar la solicitud: " + error);
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>

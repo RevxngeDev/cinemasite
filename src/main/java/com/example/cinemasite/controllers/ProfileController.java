@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -48,28 +51,33 @@ public class ProfileController {
     }
 
     @PostMapping("/uploadProfilePicture")
-    public String uploadProfilePicture(@RequestParam("profilePicture") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
-        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (!file.isEmpty()) {
-                try {
-                    String fileName = userDetails.getUsername() + "_profile.jpg";
-                    String filePath = storagePath + File.separator + fileName;
-                    File dest = new File(filePath);
-                    file.transferTo(dest);
-                    user.setProfilePicture(fileName);
-                    usersRepository.save(user);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // Manejar el error adecuadamente, quizás redirigiendo a una página de error
-                }
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> uploadProfilePicture(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) {
+        Map<String, String> response = new HashMap<>();
+        String fileName = userDetails.getUsername() + "_profile.jpg";
+        String filePath = storagePath + File.separator + fileName;
+        try {
+            file.transferTo(new File(filePath));
+            User user = usersRepository.findByEmail(userDetails.getUsername()).orElse(null);
+            if (user == null) {
+                response.put("status", "error");
+                response.put("message", "Usuario no autorizado.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
-            return "redirect:/profile";
-        } else {
-            return "error";
+            user.setProfilePicture(fileName);
+            usersRepository.save(user);
+            response.put("status", "success");
+            response.put("fileName", fileName);
+            return ResponseEntity.ok().body(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "Error al subir la imagen.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
 
     @GetMapping("/profilePicture/{fileName:.+}")
     @ResponseBody
