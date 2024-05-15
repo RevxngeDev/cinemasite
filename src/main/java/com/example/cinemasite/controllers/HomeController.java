@@ -22,14 +22,19 @@ public class HomeController {
     FilmsRepository filmsRepository;
 
     @GetMapping("/home")
-    public String getHomePage(Model model,
-                              @RequestParam(defaultValue = "0") int page,
-                              @RequestParam(defaultValue = "6") int size) {
+    public String getHomePage() {
+        return "home";
+    }
+
+    @GetMapping("/films-partial")
+    public String getFilmsPartial(@RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "6") int size,
+                                  Model model) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Films> filmsPage = filmsRepository.findAll(pageable);
         model.addAttribute("films", filmsPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", filmsPage.getTotalPages());
-        return "home";
+        return "films-partial";
     }
 }

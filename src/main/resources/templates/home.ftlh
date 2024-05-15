@@ -4,6 +4,7 @@
     <title>CinemaCity</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <style>
         .card-custom {
             width: 18rem; /* Ajusta este valor según tus necesidades */
@@ -16,6 +17,23 @@
             text-align: center; /* Centra el texto del título */
         }
     </style>
+    <script>
+        function loadFilms(page) {
+            $.get("/films-partial?page=" + page, function(data) {
+                $("#filmList").html(data);
+            });
+        }
+
+        $(document).ready(function() {
+            loadFilms(0); // Carga las películas de la primera página al cargar la página
+
+            $(document).on("click", ".pagination-link", function(e) {
+                e.preventDefault();
+                var page = $(this).data("page");
+                loadFilms(page);
+            });
+        });
+    </script>
 </head>
 <body>
 <!-- Header -->
@@ -49,40 +67,13 @@
 <main>
     <div class="container">
         <h2>Bienvenido a CinemaCity</h2>
-        <div class="row">
-            <#list films as film>
-                <div class="col-md-4 d-flex justify-content-center mb-4">
-                    <a href="/films/${film.id}" class="text-decoration-none">
-                        <div class="card card-custom shadow-sm">
-                            <img src="/images/${film.picture}" class="card-img-top card-img-top-custom" alt="${film.name}">
-                            <div class="card-body card-body-custom">
-                                <h5 class="card-title">${film.name}</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </#list>
+        <div class="row" id="filmList">
+            <!-- Aquí se mostrarán las películas -->
         </div>
 
         <!-- Paginación -->
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item<#if currentPage == 0> disabled</#if>">
-                    <a class="page-link" href="?page=${currentPage - 1}&size=6" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <#list 0..totalPages-1 as page>
-                    <li class="page-item<#if currentPage == page> active</#if>">
-                        <a class="page-link" href="?page=${page}&size=6">${page + 1}</a>
-                    </li>
-                </#list>
-                <li class="page-item<#if currentPage == totalPages - 1> disabled</#if>">
-                    <a class="page-link" href="?page=${currentPage + 1}&size=6" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
+        <nav aria-label="Page navigation" id="paginationNav">
+            <!-- Aquí se mostrará la paginación -->
         </nav>
     </div>
 </main>
