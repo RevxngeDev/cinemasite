@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FilmsServiceImpl implements FilmsService{
     @Autowired
+
     private FilmsRepository filmsRepository;
 
 
@@ -23,28 +24,9 @@ public class FilmsServiceImpl implements FilmsService{
     }
 
     @Override
-    public Page<FilmsDto> search(Integer page, Integer size, String query, String sortParametr, String directionParametr) {
-        Sort.Direction direction = Sort.Direction.ASC;
-        Sort sort = Sort.by(direction, "id");
-
-        if (directionParametr != null) {
-            direction = Sort.Direction.fromString(directionParametr);
-        }
-
-        if (sortParametr != null) {
-            sort = Sort.by(direction, sortParametr);
-        }
-
-        if (query == null) {
-            query = "empty";
-        }
-
-        if (size == null) {
-            size = 3;
-        }
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-        Page<Films> papersPage = filmsRepository.search(query,pageRequest);
-        Page<FilmsDto> filmsDtoPage = papersPage.map(FilmsDto::of);
-        return filmsDtoPage;
+    public Page<FilmsDto> searchFilms(int page, int size, String query) {
+        Pageable pageable = PageRequest.of(page, size);
+        return filmsRepository.search(query, pageable).map(FilmsDto::of);
     }
+
 }

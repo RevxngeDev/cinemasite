@@ -9,5 +9,5 @@ public interface FilmsService {
 
   Page<FilmsDto> getAllFilms(int page, int size);
 
-  Page<FilmsDto> search (Integer page, Integer size, String query, String sortParametr, String direction);
+  Page<FilmsDto> searchFilms(int page, int size, String query);
 }
