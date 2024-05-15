@@ -10,11 +10,13 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface FilmsRepository extends JpaRepository<Films, Long> {
-    Optional<Films> findById( Long id);
+    Optional<Films> findById(Long id);
 
     Page<Films> findAll(Pageable pageable);
 
-    @Query("select film from Films film  where (:q = 'empty' or UPPER(film.name) like UPPER(concat('%', :q, '%')))")
-    Page<Films> search(@Param("q") String q, Pageable pageable);
+    @Query("SELECT film FROM Films film " +
+            "WHERE (:q IS NULL OR :q = '' OR UPPER(film.name) LIKE UPPER(CONCAT('%', :q, '%'))) " +
+            "AND (:genre IS NULL OR :genre = '' OR :genre = 'ALL' OR film.type = :genre)")
+    Page<Films> search(@Param("q") String query, @Param("genre") String genre, Pageable pageable);
 
 }

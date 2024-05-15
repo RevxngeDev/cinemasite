@@ -6,15 +6,16 @@
     <title>CinemaCity</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Estilo personalizado para las tarjetas */
-        .film-card {
-            width: 250px; /* Ancho fijo para todas las tarjetas */
-            margin-bottom: 20px; /* Espaciado entre tarjetas */
+        .card-custom {
+            width: 18rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-
-        .film-card .card-img-top {
-            height: 300px; /* Altura fija para la imagen */
-            object-fit: cover; /* La imagen cubre todo el espacio del contenedor */
+        .card-img-top-custom {
+            height: 12rem;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -52,6 +53,15 @@
         <form id="searchForm" class="mb-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="Buscar películas...">
+                <select id="genreSelect" class="form-select">
+                    <option value="ALL">Todos los géneros</option>
+                    <option value="COMEDY">Comedia</option>
+                    <option value="HORROR">Horror</option>
+                    <option value="ROMANCE">Romance</option>
+                    <option value="ANIMATED">Animada</option>
+                    <option value="ACTION">Acción</option>
+                    <option value="FANTASY">Fantasía</option>
+                </select>
                 <button class="btn btn-outline-primary" type="submit">Buscar</button>
             </div>
         </form>
@@ -82,9 +92,8 @@
         $('#searchForm').submit(function(event) {
             event.preventDefault();
             let query = $('#searchInput').val().trim();
-            if (query !== '') {
-                searchFilms(query, 0);
-            }
+            let genre = $('#genreSelect').val();
+            searchFilms(query, genre, 0);
         });
     });
 
@@ -99,12 +108,13 @@
         let html = '';
         for (let i = 0; i < films.length; i++) {
             let film = films[i];
-            html += '<div class="col-md-4 mb-4">';
-            html += '<div class="card film-card shadow-sm">';
-            html += '<img src="/images/' + film.picture + '" class="card-img-top" alt="' + film.name + '">';
-            html += '<div class="card-body">';
+            html += '<div class="col-md-4 d-flex justify-content-center mb-4">';
+            html += '<a href="/films/' + film.id + '" class="text-decoration-none">';
+            html += '<div class="card card-custom shadow-sm">';
+            html += '<img src="/images/' + film.picture + '" class="card-img-top card-img-top-custom" alt="' + film.name + '">';
+            html += '<div class="card-body card-body-custom">';
             html += '<h5 class="card-title">' + film.name + '</h5>';
-            html += '</div></div></div>';
+            html += '</div></div></a></div>';
         }
         return html;
     }
@@ -133,12 +143,16 @@
 
         pagination.html(paginationHtml);
     }
-    function searchFilms(query, page) {
-        $.get("/film/search?q=" + query + "&page=" + page, function(data) {
+
+    function searchFilms(query, genre, page) {
+        $.get("/film/search?q=" + query + "&genre=" + genre + "&page=" + page, function(data) {
             $("#filmList").html(renderFilms(data.films));
             updatePagination(data.currentPage, data.totalPages);
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error("Error fetching films: ", textStatus, errorThrown);
         });
     }
+
 </script>
 </body>
 </html>

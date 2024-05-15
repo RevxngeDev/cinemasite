@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface FilmsService {
 
-  Page<FilmsDto> getAllFilms(int page, int size);
+  Page<Films> searchFilms(String query, String genre, int page, int size);
 
-  Page<FilmsDto> searchFilms(int page, int size, String query);
+  Page<Films> getAllFilms(int page, int size);
 }
