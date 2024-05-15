@@ -6,6 +6,16 @@
     <title>CinemaCity</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Estilo personalizado para las tarjetas */
+        .film-card {
+            width: 250px; /* Ancho fijo para todas las tarjetas */
+            margin-bottom: 20px; /* Espaciado entre tarjetas */
+        }
+
+        .film-card .card-img-top {
+            height: 300px; /* Altura fija para la imagen */
+            object-fit: cover; /* La imagen cubre todo el espacio del contenedor */
+        }
     </style>
 </head>
 <body>
@@ -89,13 +99,12 @@
         let html = '';
         for (let i = 0; i < films.length; i++) {
             let film = films[i];
-            html += '<div class="col-md-4 d-flex justify-content-center mb-4">';
-            html += '<a href="/films/' + film.id + '" class="text-decoration-none">';
-            html += '<div class="card card-custom shadow-sm">';
-            html += '<img src="/images/' + film.picture + '" class="card-img-top card-img-top-custom" alt="' + film.name + '">';
-            html += '<div class="card-body card-body-custom">';
+            html += '<div class="col-md-4 mb-4">';
+            html += '<div class="card film-card shadow-sm">';
+            html += '<img src="/images/' + film.picture + '" class="card-img-top" alt="' + film.name + '">';
+            html += '<div class="card-body">';
             html += '<h5 class="card-title">' + film.name + '</h5>';
-            html += '</div></div></a></div>';
+            html += '</div></div></div>';
         }
         return html;
     }
@@ -124,14 +133,12 @@
 
         pagination.html(paginationHtml);
     }
-
     function searchFilms(query, page) {
         $.get("/film/search?q=" + query + "&page=" + page, function(data) {
             $("#filmList").html(renderFilms(data.films));
             updatePagination(data.currentPage, data.totalPages);
         });
     }
-
 </script>
 </body>
 </html>
