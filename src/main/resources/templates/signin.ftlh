@@ -21,6 +21,6 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-
+<p>No tienes una cuenta? <a href="/signUp">Crea una</a>.</p>
 </body>
 </html>

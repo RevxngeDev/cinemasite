@@ -60,6 +60,7 @@
                 </div>
             </div>
         </form>
+        <p>"<-"<a href="/home">Volver</a>.</p>
     </div>
 </div>
 

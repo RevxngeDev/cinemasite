@@ -7,15 +7,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .card-custom {
-            width: 18rem;
+            width: 20rem; /* Ajusta el ancho de la tarjeta */
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
         .card-img-top-custom {
-            height: 12rem;
+            height: 25rem; /* Ajusta la altura de la imagen */
             object-fit: cover;
+        }
+        .card-title {
+            text-align: center; /* Centra el texto del título */
+            margin-top: 0.5rem; /* Añade un poco de espacio encima del título */
         }
     </style>
 </head>
@@ -36,10 +37,21 @@
                 </ul>
                 <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active btn btn-success" aria-current="page" href="/signIn">Login</a>
+                        <span class="nav-link active">
+                            <#if userName??>
+                             <!-- Si hay una foto de perfil, mostrarla -->
+                             <#if profilePicture??>
+                                 <img src="/profilePicture/${profilePicture}" alt="Profile Picture" style="width: 35px; height: 35px; border-radius: 50%;">
+                             </#if>
+                                 Bienvenido, ${userName}
+                            </#if>
+                        </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/signUp">Sign Up</a>
+                        <a class="nav-link active btn btn-success" aria-current="page" href="/profile">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/logout">logOut</a>
                     </li>
                 </ul>
             </div>

@@ -31,8 +31,8 @@
         <label for="phone" class="form-label">Phone</label>
         <input name="phone" class="form-control" id="phone">
     </div>
-
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+<p>Ya tienes una cuenta? <a href="/signIn">Inicia sesion</a>.</p>
 </body>
 </html>
