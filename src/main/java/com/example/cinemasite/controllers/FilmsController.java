@@ -60,7 +60,8 @@ public class FilmsController {
     public ResponseEntity<Map<String, String>> addFilm(@RequestParam("name") String name,
                                                        @RequestParam("picture") MultipartFile picture,
                                                        @RequestParam("type") Type type,
-                                                       @RequestParam("overview") String overview) {
+                                                       @RequestParam("overview") String overview,
+                                                       @RequestParam("youtubeLink") String youtubeLink) {
         Map<String, String> response = new HashMap<>();
         try {
             // Guardar la imagen
@@ -75,6 +76,7 @@ public class FilmsController {
                     .picture(fileName)
                     .type(type)
                     .overView(overview)
+                    .youtubeLink(youtubeLink)
                     .build();
             filmsRepository.save(film);
 

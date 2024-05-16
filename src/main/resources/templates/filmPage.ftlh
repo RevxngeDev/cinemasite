@@ -28,6 +28,17 @@
             padding: 10px;
             margin-top: 20px;
         }
+        .video {
+            max-width: 800px; /* Ajusta el ancho máximo según tus preferencias */
+            margin: auto; /* Centra horizontalmente */
+        }
+
+        .video iframe {
+            width: 100%; /* Ajusta el ancho al 100% */
+            height: 450px; /* Ajusta la altura según tus preferencias */
+            border: none; /* Elimina el borde del iframe */
+        }
+
     </style>
 </head>
 <body>
@@ -56,6 +67,14 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="video text-center mt-5">
+    <#if film.youtubeLink?has_content>
+        <div class="mt-3">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/${film.youtubeLink}" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </#if>
 </div>
 
 <div class="container mt-5">
