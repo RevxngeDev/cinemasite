@@ -7,6 +7,7 @@ import com.example.cinemasite.models.User;
 import com.example.cinemasite.repositores.FilmRatingRepository;
 import com.example.cinemasite.repositores.FilmsRepository;
 import com.example.cinemasite.repositores.UsersRepository;
+import com.example.cinemasite.services.CommentService;
 import com.example.cinemasite.services.FilmRatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +44,9 @@ public class FilmsController {
 
     @Autowired
     private FilmRatingRepository filmRatingRepository;
+
+    @Autowired
+    private CommentService commentService;
 
     @Value("${storage.path}")
     private String storagePath;
@@ -108,6 +112,9 @@ public class FilmsController {
             Films film = optionalFilm.get();
             model.addAttribute("film", film);
 
+            // Obtener los comentarios para la película
+            model.addAttribute("comments", commentService.getCommentsByFilm(film));
+
             // Verificar si el usuario ha dado "like" a esta película
             boolean userLikedFilm = false;
             if (userDetails != null) {
@@ -115,6 +122,7 @@ public class FilmsController {
                 if (optionalUser.isPresent()) {
                     Long userId = optionalUser.get().getId();
                     userLikedFilm = filmRatingService.hasUserLikedFilm(id, userId);
+                    model.addAttribute("currentUser", optionalUser.get());
                 }
             }
             model.addAttribute("userLikedFilm", userLikedFilm);
@@ -146,6 +154,21 @@ public class FilmsController {
             filmRatingService.rateFilm(id, userId, false); // Cambiar a "false" para dislike
         }
         // Redirige de vuelta a la misma página de la película
+        return "redirect:/films/" + id;
+    }
+
+    @PostMapping("/films/{id}/comment")
+    public String addComment(@PathVariable Long id, @RequestParam("text") String text, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails != null) {
+            Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+            Optional<Films> optionalFilm = filmsRepository.findById(id);
+
+            if (optionalUser.isPresent() && optionalFilm.isPresent()) {
+                User user = optionalUser.get();
+                Films film = optionalFilm.get();
+                commentService.addComment(film, user, text);
+            }
+        }
         return "redirect:/films/" + id;
     }
 

@@ -21,6 +21,13 @@
         .film-overview {
             max-width: 400px; /* Ajusta este valor según tus necesidades */
         }
+        .comments-section {
+            max-height: 300px; /* Ajusta este valor según tus necesidades */
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -49,6 +56,25 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="container mt-5">
+    <h2>Comentarios</h2>
+    <div class="comments-section">
+        <#list comments as comment>
+            <div>
+                <p><strong>${comment.user.firstName} ${comment.user.lastName}</strong>:</p>
+                <p>${comment.text}</p>
+            </div>
+        </#list>
+    </div>
+
+    <#if currentUser??>
+        <form action="/films/${film.id}/comment" method="post" class="mt-3">
+            <textarea name="text" rows="3" class="form-control" required></textarea><br>
+            <button type="submit" class="btn btn-primary">Añadir comentario</button>
+        </form>
+    </#if>
 </div>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
