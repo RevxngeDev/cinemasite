@@ -26,6 +26,14 @@
         <div class="film-content">
             <div class="text-center">
                 <img src="/images/${film.picture}" class="img-fluid film-img" alt="${film.name}">
+                <div>
+                    <form action="/films/${film.id}/like" method="post">
+                        <button type="submit" class="btn btn-success">Like</button>
+                    </form>
+                    <form action="/films/${film.id}/dislike" method="post">
+                        <button type="submit" class="btn btn-danger">Dislike</button>
+                    </form>
+                </div>
             </div>
             <div class="film-overview">
                 <h1>${film.name}</h1>

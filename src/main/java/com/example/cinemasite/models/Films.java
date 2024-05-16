@@ -1,11 +1,13 @@
 package com.example.cinemasite.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,4 +29,7 @@ public class Films {
 
     private String overView;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
+    private List<FilmRating> ratings;
 }

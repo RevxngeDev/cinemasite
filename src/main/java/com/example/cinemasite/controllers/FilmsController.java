@@ -2,12 +2,17 @@ package com.example.cinemasite.controllers;
 
 import com.example.cinemasite.models.Films;
 import com.example.cinemasite.models.Type;
+import com.example.cinemasite.models.User;
 import com.example.cinemasite.repositores.FilmsRepository;
+import com.example.cinemasite.repositores.UsersRepository;
+import com.example.cinemasite.services.FilmRatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +32,12 @@ public class FilmsController {
 
     @Autowired
     private FilmsRepository filmsRepository;
+
+    @Autowired
+    private FilmRatingService filmRatingService;
+
+    @Autowired
+    private UsersRepository usersRepository;
 
     @Value("${storage.path}")
     private String storagePath;
@@ -97,5 +108,29 @@ public class FilmsController {
         }
     }
 
+    @PostMapping("/films/{id}/like")
+    public ResponseEntity<String> likeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+
+        if (optionalUser.isPresent()) {
+            Long userId = optionalUser.get().getId();
+            filmRatingService.rateFilm(id, userId, true);
+            return ResponseEntity.ok("Film liked successfully");
+        } else {
+            return ResponseEntity.status(404).body("User not found");
+        }
+    }
+    @PostMapping("/films/{id}/dislike")
+    public ResponseEntity<String> dislikeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+
+        if (optionalUser.isPresent()) {
+            Long userId = optionalUser.get().getId();
+            filmRatingService.rateFilm(id, userId, false); // Cambiar a "false" para dislike
+            return ResponseEntity.ok("Film disliked successfully");
+        } else {
+            return ResponseEntity.status(404).body("User not found");
+        }
+    }
 
 }
