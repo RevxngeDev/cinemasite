@@ -56,4 +56,22 @@ public class FilmRatingServiceImpl implements FilmRatingService{
             }
         }
     }
+
+    @Override
+    public boolean hasUserLikedFilm(Long filmId, Long userId) {
+        Optional<Films> optionalFilm = filmsRepository.findById(filmId);
+        Optional<User> optionalUser = usersRepository.findById(userId);
+
+        if (optionalFilm.isPresent() && optionalUser.isPresent()) {
+            Films film = optionalFilm.get();
+            User user = optionalUser.get();
+
+            // Buscar si ya existe una calificación para esta película y usuario
+            Optional<FilmRating> existingRating = filmRatingRepository.findByFilmAndUser(film, user);
+
+            return existingRating.isPresent() && existingRating.get().isLiked();
+        }
+
+        return false;
+    }
 }

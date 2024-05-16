@@ -1,8 +1,10 @@
 package com.example.cinemasite.controllers;
 
+import com.example.cinemasite.models.FilmRating;
 import com.example.cinemasite.models.Films;
 import com.example.cinemasite.models.Type;
 import com.example.cinemasite.models.User;
+import com.example.cinemasite.repositores.FilmRatingRepository;
 import com.example.cinemasite.repositores.FilmsRepository;
 import com.example.cinemasite.repositores.UsersRepository;
 import com.example.cinemasite.services.FilmRatingService;
@@ -38,6 +40,9 @@ public class FilmsController {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private FilmRatingRepository filmRatingRepository;
 
     @Value("${storage.path}")
     private String storagePath;
@@ -97,11 +102,23 @@ public class FilmsController {
     }
 
     @GetMapping("/films/{id}")
-    public String getFilmPage(@PathVariable Long id, Model model) {
+    public String getFilmPage(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         Optional<Films> optionalFilm = filmsRepository.findById(id);
         if (optionalFilm.isPresent()) {
             Films film = optionalFilm.get();
             model.addAttribute("film", film);
+
+            // Verificar si el usuario ha dado "like" a esta película
+            boolean userLikedFilm = false;
+            if (userDetails != null) {
+                Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+                if (optionalUser.isPresent()) {
+                    Long userId = optionalUser.get().getId();
+                    userLikedFilm = filmRatingService.hasUserLikedFilm(id, userId);
+                }
+            }
+            model.addAttribute("userLikedFilm", userLikedFilm);
+
             return "filmPage"; // Cambia "filmPage" al nombre de tu plantilla para la página de la película
         } else {
             return "redirect:/home"; // O a otra página de error si no se encuentra la película
@@ -109,28 +126,27 @@ public class FilmsController {
     }
 
     @PostMapping("/films/{id}/like")
-    public ResponseEntity<String> likeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    public String likeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, true);
-            return ResponseEntity.ok("Film liked successfully");
-        } else {
-            return ResponseEntity.status(404).body("User not found");
         }
+        // Redirige de vuelta a la misma página de la película
+        return "redirect:/films/" + id;
     }
+
     @PostMapping("/films/{id}/dislike")
-    public ResponseEntity<String> dislikeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    public String dislikeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, false); // Cambiar a "false" para dislike
-            return ResponseEntity.ok("Film disliked successfully");
-        } else {
-            return ResponseEntity.status(404).body("User not found");
         }
+        // Redirige de vuelta a la misma página de la película
+        return "redirect:/films/" + id;
     }
 
 }
