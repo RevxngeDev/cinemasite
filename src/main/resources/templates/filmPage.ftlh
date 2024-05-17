@@ -109,8 +109,9 @@
     </#if>
 </div>
 
-<!-- Agregar título de la película -->
+<!-- Mostrar precio de la película -->
 <h2 class="text-center">${film.name}</h2>
+<p class="text-center"><strong>Precio por asiento:</strong> $${film.price}</p> <!-- Mostrar precio por asiento -->
 
 <!-- Formato de reserva de asientos -->
 <div class="reservation-container">
@@ -124,8 +125,9 @@
             <#list 1..16 as seatId>
             <div class="seat">
                 <label for="seat${seatId}" style="margin-bottom: 0;">${seatId}</label>
-                <input type="checkbox" id="seat${seatId}" name="seats" value="${seatId}" style="margin-top: 0;"
-                       <#if reservedSeats?seq_contains(seatId)>disabled</#if>>
+                <input type="checkbox" id="seat${seatId}" name="seats" value="${seatId}" style="margin-top: 0;" class="seat-checkbox"
+                       data-price="${film.price}"
+                <#if reservedSeats?seq_contains(seatId)>disabled</#if>>
             </div>
             <#if seatId % 4 == 0>
         </div><div class="seat-layout">
@@ -136,6 +138,11 @@
             <button type="submit" class="btn btn-primary mt-3">Reservar</button>
         </div>
     </form>
+</div>
+
+<!-- Área de visualización del total acumulado -->
+<div class="total-container text-center mt-3">
+    <h4>Total: $<span id="totalAmount">0.00</span></h4>
 </div>
 
 <div class="container mt-5">
@@ -156,8 +163,29 @@
         </form>
     </#if>
 </div>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<!-- Script para calcular el total -->
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const checkboxes = document.querySelectorAll('.seat-checkbox');
+        const totalAmountElement = document.getElementById('totalAmount');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                let total = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) {
+                        total += parseFloat(cb.getAttribute('data-price')); // Usar getAttribute para obtener el precio
+                    }
+                });
+                totalAmountElement.textContent = total.toFixed(2);
+            });
+        });
+    });
+</script>
 </body>
 </html>
 

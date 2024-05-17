@@ -31,6 +31,8 @@ public class Films {
 
     private String youtubeLink;
 
+    private Double price;
+
     @JsonIgnore
     @OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
     private List<FilmRating> ratings;

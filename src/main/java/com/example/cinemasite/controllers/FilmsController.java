@@ -64,7 +64,8 @@ public class FilmsController {
                                                        @RequestParam("picture") MultipartFile picture,
                                                        @RequestParam("type") Type type,
                                                        @RequestParam("overview") String overview,
-                                                       @RequestParam("youtubeLink") String youtubeLink) {
+                                                       @RequestParam("youtubeLink") String youtubeLink,
+                                                       @RequestParam("price") Double price) { // Nuevo parámetro
         Map<String, String> response = new HashMap<>();
         try {
             // Guardar la imagen
@@ -80,6 +81,7 @@ public class FilmsController {
                     .type(type)
                     .overView(overview)
                     .youtubeLink(youtubeLink)
+                    .price(price) // Asignar el precio
                     .build();
             filmsRepository.save(film);
 

@@ -54,6 +54,10 @@
                 <label for="youtubeLink">YouTube Link:</label>
                 <input type="url" class="form-control" id="youtubeLink" name="youtubeLink" required>
             </div>
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="text" id="price" name="price"><br>
+            </div>
             <button type="button" class="btn btn-primary" id="submitButton">Add Film</button>
             <a class="btn btn-primary" href="/dashboard">Back to dashboard</a>
         </form>
