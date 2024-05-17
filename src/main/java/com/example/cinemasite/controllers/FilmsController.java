@@ -9,6 +9,7 @@ import com.example.cinemasite.services.CommentService;
 import com.example.cinemasite.services.FilmRatingService;
 import com.example.cinemasite.services.FilmsService;
 import com.example.cinemasite.services.MailService;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,9 @@ public class FilmsController {
 
     @Autowired
     private FilmsRepository filmsRepository;
+
+    @Autowired
+    private FilmsService filmsService;
 
     @Autowired
     private FilmRatingService filmRatingService;
@@ -59,10 +64,10 @@ public class FilmsController {
     private String storagePath;
 
     @GetMapping("/films")
-    public String getAddFilmPage(){
+    public String getAddFilmPage(Model model){
+        model.addAttribute("filmsList", filmsService.getAllFilms());
         return "films";
     }
-
     @PostMapping("/addFilm")
     public ResponseEntity<Map<String, String>> addFilm(@RequestParam("name") String name,
                                                        @RequestParam("picture") MultipartFile picture,
@@ -72,20 +77,19 @@ public class FilmsController {
                                                        @RequestParam("price") Double price) { // Nuevo parámetro
         Map<String, String> response = new HashMap<>();
         try {
-            // Guardar la imagen
+
             String fileName = picture.getOriginalFilename();
             String filePath = storagePath + File.separator + fileName;
             File dest = new File(filePath);
             picture.transferTo(dest);
 
-            // Crear y guardar la película
             Films film = Films.builder()
                     .name(name)
                     .picture(fileName)
                     .type(type)
                     .overView(overview)
                     .youtubeLink(youtubeLink)
-                    .price(price) // Asignar el precio
+                    .price(price)
                     .build();
             filmsRepository.save(film);
 
@@ -99,6 +103,79 @@ public class FilmsController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+    @PostMapping("/films/{id}/delete")
+    public RedirectView deleteFilm(@PathVariable Long id) {
+        try {
+            filmsService.deleteSeatReservationsByFilmId(id);
+            filmsRepository.deleteById(id);
+            return new RedirectView("/films", true);
+        } catch (Exception e) {
+            // Manejo de errores
+            return new RedirectView("/error", true); // Puedes redireccionar a una página de error
+        }
+    }
+    @GetMapping("/getFilmDetails/{id}")
+    public ResponseEntity<Map<String, Object>> getFilmDetails(@PathVariable Long id) {
+        Optional<Films> optionalFilm = filmsRepository.findById(id);
+        if (optionalFilm.isPresent()) {
+            Films film = optionalFilm.get();
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", film.getId());
+            response.put("name", film.getName());
+            response.put("type", film.getType());
+            response.put("overview", film.getOverView());
+            response.put("youtubeLink", film.getYoutubeLink());
+            response.put("price", film.getPrice());
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+    @PostMapping("/updateFilm/{id}")
+    public ResponseEntity<Map<String, String>> updateFilm(@PathVariable Long id,
+                                                          @RequestParam("name") String name,
+                                                          @RequestParam(value = "picture", required = false) MultipartFile picture,
+                                                          @RequestParam("type") Type type,
+                                                          @RequestParam("overview") String overview,
+                                                          @RequestParam("youtubeLink") String youtubeLink,
+                                                          @RequestParam("price") Double price) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            Optional<Films> optionalFilm = filmsRepository.findById(id);
+            if (optionalFilm.isPresent()) {
+                Films film = optionalFilm.get();
+                film.setName(name);
+                film.setType(type);
+                film.setOverView(overview);
+                film.setYoutubeLink(youtubeLink);
+                film.setPrice(price);
+
+                if (picture != null && !picture.isEmpty()) {
+                    String fileName = picture.getOriginalFilename();
+                    String filePath = storagePath + File.separator + fileName;
+                    File dest = new File(filePath);
+                    picture.transferTo(dest);
+                    film.setPicture(fileName);
+                }
+
+                filmsRepository.save(film);
+                response.put("status", "success");
+                response.put("message", "Film updated successfully");
+                return ResponseEntity.ok().body(response);
+            } else {
+                response.put("status", "error");
+                response.put("message", "Film not found");
+                return ResponseEntity.status(404).body(response);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "Error updating the film");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
 
     @GetMapping("/images/{filename:.+}")
     @ResponseBody
@@ -123,14 +200,11 @@ public class FilmsController {
             Films film = optionalFilm.get();
             model.addAttribute("film", film);
 
-            // Obtener los asientos reservados para la película
             List<Long> reservedSeats = seatReservationRepository.findReservedSeatsByFilmId(id);
             model.addAttribute("reservedSeats", reservedSeats);
 
-            // Obtener los comentarios para la película
             model.addAttribute("comments", commentService.getCommentsByFilm(film));
 
-            // Verificar si el usuario ha dado "like" a esta película
             boolean userLikedFilm = false;
             if (userDetails != null) {
                 Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
@@ -142,13 +216,11 @@ public class FilmsController {
             }
             model.addAttribute("userLikedFilm", userLikedFilm);
 
-            return "filmPage"; // Cambia "filmPage" al nombre de tu plantilla para la página de la película
+            return "filmPage";
         } else {
-            return "redirect:/home"; // O a otra página de error si no se encuentra la película
+            return "redirect:/home";
         }
     }
-
-
 
     @PostMapping("/films/{id}/like")
     public String likeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
@@ -158,7 +230,7 @@ public class FilmsController {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, true);
         }
-        // Redirige de vuelta a la misma página de la película
+
         return "redirect:/films/" + id;
     }
 
@@ -168,9 +240,9 @@ public class FilmsController {
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
-            filmRatingService.rateFilm(id, userId, false); // Cambiar a "false" para dislike
+            filmRatingService.rateFilm(id, userId, false);
         }
-        // Redirige de vuelta a la misma página de la película
+
         return "redirect:/films/" + id;
     }
 
@@ -193,16 +265,14 @@ public class FilmsController {
     public String reserveSeats(@RequestParam("filmId") Long filmId,
                                @RequestParam("userId") Long userId,
                                @RequestParam("seats") List<Long> seatIds) {
-        // Buscar la película por su ID
+
         Optional<Films> optionalFilm = filmsRepository.findById(filmId);
-        // Buscar el usuario por su ID
         Optional<User> optionalUser = usersRepository.findById(userId);
 
         if (optionalFilm.isPresent() && optionalUser.isPresent()) {
             Films film = optionalFilm.get();
             User user = optionalUser.get();
 
-            // Crear una nueva reserva de asientos
             SeatReservation reservation = SeatReservation.builder()
                     .film(film)
                     .user(user)
@@ -210,16 +280,11 @@ public class FilmsController {
                     .build();
             seatReservationRepository.save(reservation);
 
-            // Enviar correo de confirmación de reserva
             mailService.sendReservationEmail(user.getEmail(), film.getName(), seatIds);
 
-            // Redirige a alguna página después de la reserva
-            return "redirect:/films/" + filmId; // Cambia esto a la página que desees mostrar después de la reserva
+            return "redirect:/films/" + filmId;
         } else {
-            // Redirige a una página de error si la película o el usuario no existen
-            return "redirect:/error"; // Cambia esto a la página de error adecuada
+            return "redirect:/error";
         }
     }
-
-
 }

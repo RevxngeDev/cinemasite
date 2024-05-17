@@ -11,4 +11,6 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
 
     @Query("SELECT DISTINCT seat FROM SeatReservation sr JOIN sr.seatIds seat WHERE sr.film.id = :filmId")
     List<Long> findReservedSeatsByFilmId(Long filmId);
+
+    void deleteByFilmId(Long filmId);
 }

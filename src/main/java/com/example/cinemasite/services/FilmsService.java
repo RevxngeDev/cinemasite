@@ -11,4 +11,12 @@ public interface FilmsService {
   Page<Films> searchFilms(String query, String genre, int page, int size);
 
   Page<Films> getAllFilms(int page, int size);
+
+  List<Films> getAllFilms();
+
+  Films getFilmById(Long id);
+
+  void deleteFilmById(Long id);
+
+  void deleteSeatReservationsByFilmId(Long filmId);
 }
