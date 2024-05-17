@@ -2,7 +2,13 @@ package com.example.cinemasite.repositores;
 
 import com.example.cinemasite.models.SeatReservation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 public interface SeatReservationRepository extends JpaRepository<SeatReservation, Long> {
-    // Puedes agregar métodos personalizados según tus necesidades
+
+    @Query("SELECT DISTINCT seat FROM SeatReservation sr JOIN sr.seatIds seat WHERE sr.film.id = :filmId")
+    List<Long> findReservedSeatsByFilmId(Long filmId);
 }

@@ -8,6 +8,7 @@
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/28eab93eea.js" crossorigin="anonymous"></script>
     <style>
+        @import url("https://fonts.googleapis.com/css?family=Lato&display=swap");
         .film-content {
             display: flex;
             justify-content: center;
@@ -38,7 +39,38 @@
             height: 450px; /* Ajusta la altura según tus preferencias */
             border: none; /* Elimina el borde del iframe */
         }
+        .seat-layout {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
 
+        .seat {
+            margin: 5px;
+        }
+        .reservation-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .screen {
+            background-color: grey;
+            height: 80px; /* Reduciendo la altura */
+            width: 40%; /* Ajustando el ancho */
+            margin: 15px auto; /* Centrando horizontalmente */
+            transform: perspective(1000px) rotateX(-30deg); /* Añadiendo perspectiva y rotación */
+            box-shadow: 0 3px 10px rgba(255, 255, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .reserve-btn-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -74,34 +106,35 @@
         <div class="mt-3">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/${film.youtubeLink}" frameborder="0" allowfullscreen></iframe>
         </div>
-        <div class="mt-3">
-            <a href="/tickets" class="btn btn-secondary">Buy a tickets!</a>
-        </div>
     </#if>
 </div>
 
 <!-- Agregar título de la película -->
-<h2>${film.name}</h2>
+<h2 class="text-center">${film.name}</h2>
 
 <!-- Formato de reserva de asientos -->
-<div>
+<div class="reservation-container">
     <h3>Reserva de Asientos</h3>
     <p>Selecciona tus asientos:</p>
+    <div class="screen">Screen</div>
     <form action="/reserve-seats" method="post">
         <input type="hidden" name="filmId" value="${film.id}">
         <input type="hidden" name="userId" value="${currentUser.id}"> <!-- Asegúrate de que currentUser tenga el ID del usuario actual -->
-        <div class="row">
+        <div class="seat-layout">
             <#list 1..16 as seatId>
-            <div class="col-2" style="margin-bottom: 10px;">
-                <label for="seat${seatId}" style="margin-bottom: 0;">Asiento ${seatId}:</label>
-                <input type="checkbox" id="seat${seatId}" name="seats" value="${seatId}" style="margin-top: 0;">
+            <div class="seat">
+                <label for="seat${seatId}" style="margin-bottom: 0;">${seatId}</label>
+                <input type="checkbox" id="seat${seatId}" name="seats" value="${seatId}" style="margin-top: 0;"
+                       <#if reservedSeats?seq_contains(seatId)>disabled</#if>>
             </div>
             <#if seatId % 4 == 0>
-        </div><div class="row">
+        </div><div class="seat-layout">
             </#if>
             </#list>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Reservar</button>
+        <div class="reserve-btn-container">
+            <button type="submit" class="btn btn-primary mt-3">Reservar</button>
+        </div>
     </form>
 </div>
 

@@ -117,6 +117,10 @@ public class FilmsController {
             Films film = optionalFilm.get();
             model.addAttribute("film", film);
 
+            // Obtener los asientos reservados para la película
+            List<Long> reservedSeats = seatReservationRepository.findReservedSeatsByFilmId(id);
+            model.addAttribute("reservedSeats", reservedSeats);
+
             // Obtener los comentarios para la película
             model.addAttribute("comments", commentService.getCommentsByFilm(film));
 
@@ -137,6 +141,8 @@ public class FilmsController {
             return "redirect:/home"; // O a otra página de error si no se encuentra la película
         }
     }
+
+
 
     @PostMapping("/films/{id}/like")
     public String likeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
