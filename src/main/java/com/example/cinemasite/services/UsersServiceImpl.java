@@ -19,4 +19,13 @@ public class UsersServiceImpl implements UsersService{
     public List<UserDto> getAllUsers() {
         return userList(usersRepository.findAll());
     }
+
+    @Override
+    public boolean deleteUserById(Long id) {
+        if (usersRepository.existsById(id)) {
+            usersRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }

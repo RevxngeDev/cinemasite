@@ -59,7 +59,7 @@ public class FilmsController {
     private String storagePath;
 
     @GetMapping("/films")
-    public String getSignInPage(){
+    public String getAddFilmPage(){
         return "films";
     }
 
