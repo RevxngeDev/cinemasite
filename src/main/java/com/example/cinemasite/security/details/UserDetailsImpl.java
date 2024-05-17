@@ -1,6 +1,7 @@
 package com.example.cinemasite.security.details;
 
 
+import com.example.cinemasite.models.State;
 import com.example.cinemasite.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -47,6 +48,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getConfirmed().equals("CONFIRMED");
+        return user.getState().equals(State.CONFIRMED);
     }
 }

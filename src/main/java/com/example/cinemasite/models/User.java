@@ -26,11 +26,14 @@ public class User {
     private String lastName;
     private String phone;
 
-    private String confirmed;
-
     private Role role;
 
     private String profilePicture;
+
+    @Enumerated(value = EnumType.STRING)
+    private State state;
+
+    private String confirmCode;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
