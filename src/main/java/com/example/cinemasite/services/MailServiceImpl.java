@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @Component
 public class MailServiceImpl implements MailService{
@@ -28,54 +29,68 @@ public class MailServiceImpl implements MailService{
     private String mailFrom;
 
     private final Template confirmMailTemplate;
+    private final Template reservationMailTemplate;
 
-    public MailServiceImpl(){
+    public MailServiceImpl() {
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
         configuration.setDefaultEncoding("UTF-8");
         configuration.setTemplateLoader(
-                new SpringTemplateLoader(new ClassRelativeResourceLoader(this.getClass()),
-                        "/"));
+                new SpringTemplateLoader(new ClassRelativeResourceLoader(this.getClass()), "/"));
         configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         try {
             this.confirmMailTemplate = configuration.getTemplate("templates/confirm_mail.ftlh");
-        } catch (IOException e){
+            this.reservationMailTemplate = configuration.getTemplate("templates/reservation_mail.ftlh");
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-
     }
 
 
     @Override
     public void sendEmailForConfirm(String email, String code) {
-        String mailText = getEmailText(code);
-
-        MimeMessagePreparator messagePreparator = getEmail(email, mailText);
-
+        String mailText = getEmailText(confirmMailTemplate, "confirm_code", code);
+        MimeMessagePreparator messagePreparator = getEmail(email, mailText, "Регистрация");
         javaMailSender.send(messagePreparator);
     }
 
-    private MimeMessagePreparator getEmail(String email, String mailText){
-        MimeMessagePreparator messagePreparator = mimeMessage -> {
+    @Override
+    public void sendReservationEmail(String email, String filmName, List<Long> seatIds) {
+        String mailText = getReservationEmailText(filmName, seatIds);
+        MimeMessagePreparator messagePreparator = getEmail(email, mailText, "Confirmación de Reserva");
+        javaMailSender.send(messagePreparator);
+    }
+
+    private MimeMessagePreparator getEmail(String email, String mailText, String subject) {
+        return mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setFrom(mailFrom);
             messageHelper.setTo(email);
-            messageHelper.setSubject("Регистрация");
+            messageHelper.setSubject(subject);
             messageHelper.setText(mailText, true);
         };
-        return messagePreparator;
     }
 
-    private String getEmailText(String code) {
+    private String getEmailText(Template template, String key, String value) {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put("confirm_code", code);
-
+        attributes.put(key, value);
         StringWriter writer = new StringWriter();
         try {
-            confirmMailTemplate.process(attributes, writer);
-        } catch (TemplateException | IOException e){
+            template.process(attributes, writer);
+        } catch (TemplateException | IOException e) {
             throw new IllegalStateException(e);
         }
-
+        return writer.toString();
+    }
+    private String getReservationEmailText(String filmName, List<Long> seatIds) {
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("filmName", filmName);
+        attributes.put("seatIds", seatIds);
+        StringWriter writer = new StringWriter();
+        try {
+            reservationMailTemplate.process(attributes, writer);
+        } catch (TemplateException | IOException e) {
+            throw new IllegalStateException(e);
+        }
         return writer.toString();
     }
 }

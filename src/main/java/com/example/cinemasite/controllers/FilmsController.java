@@ -8,6 +8,7 @@ import com.example.cinemasite.repositores.UsersRepository;
 import com.example.cinemasite.services.CommentService;
 import com.example.cinemasite.services.FilmRatingService;
 import com.example.cinemasite.services.FilmsService;
+import com.example.cinemasite.services.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -50,6 +51,9 @@ public class FilmsController {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private MailService mailService;
 
     @Value("${storage.path}")
     private String storagePath;
@@ -206,6 +210,9 @@ public class FilmsController {
                     .build();
             seatReservationRepository.save(reservation);
 
+            // Enviar correo de confirmación de reserva
+            mailService.sendReservationEmail(user.getEmail(), film.getName(), seatIds);
+
             // Redirige a alguna página después de la reserva
             return "redirect:/films/" + filmId; // Cambia esto a la página que desees mostrar después de la reserva
         } else {
@@ -213,5 +220,6 @@ public class FilmsController {
             return "redirect:/error"; // Cambia esto a la página de error adecuada
         }
     }
+
 
 }
