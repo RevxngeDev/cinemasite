@@ -1,14 +1,13 @@
 package com.example.cinemasite.controllers;
 
-import com.example.cinemasite.models.FilmRating;
-import com.example.cinemasite.models.Films;
-import com.example.cinemasite.models.Type;
-import com.example.cinemasite.models.User;
+import com.example.cinemasite.models.*;
 import com.example.cinemasite.repositores.FilmRatingRepository;
 import com.example.cinemasite.repositores.FilmsRepository;
+import com.example.cinemasite.repositores.SeatReservationRepository;
 import com.example.cinemasite.repositores.UsersRepository;
 import com.example.cinemasite.services.CommentService;
 import com.example.cinemasite.services.FilmRatingService;
+import com.example.cinemasite.services.FilmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -27,6 +26,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,6 +44,9 @@ public class FilmsController {
 
     @Autowired
     private FilmRatingRepository filmRatingRepository;
+
+    @Autowired
+    private SeatReservationRepository seatReservationRepository;
 
     @Autowired
     private CommentService commentService;
@@ -172,6 +175,35 @@ public class FilmsController {
             }
         }
         return "redirect:/films/" + id;
+    }
+
+    @PostMapping("/reserve-seats")
+    public String reserveSeats(@RequestParam("filmId") Long filmId,
+                               @RequestParam("userId") Long userId,
+                               @RequestParam("seats") List<Long> seatIds) {
+        // Buscar la película por su ID
+        Optional<Films> optionalFilm = filmsRepository.findById(filmId);
+        // Buscar el usuario por su ID
+        Optional<User> optionalUser = usersRepository.findById(userId);
+
+        if (optionalFilm.isPresent() && optionalUser.isPresent()) {
+            Films film = optionalFilm.get();
+            User user = optionalUser.get();
+
+            // Crear una nueva reserva de asientos
+            SeatReservation reservation = SeatReservation.builder()
+                    .film(film)
+                    .user(user)
+                    .seatIds(seatIds)
+                    .build();
+            seatReservationRepository.save(reservation);
+
+            // Redirige a alguna página después de la reserva
+            return "redirect:/films/" + filmId; // Cambia esto a la página que desees mostrar después de la reserva
+        } else {
+            // Redirige a una página de error si la película o el usuario no existen
+            return "redirect:/error"; // Cambia esto a la página de error adecuada
+        }
     }
 
 }

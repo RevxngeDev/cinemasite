@@ -74,7 +74,35 @@
         <div class="mt-3">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/${film.youtubeLink}" frameborder="0" allowfullscreen></iframe>
         </div>
+        <div class="mt-3">
+            <a href="/tickets" class="btn btn-secondary">Buy a tickets!</a>
+        </div>
     </#if>
+</div>
+
+<!-- Agregar título de la película -->
+<h2>${film.name}</h2>
+
+<!-- Formato de reserva de asientos -->
+<div>
+    <h3>Reserva de Asientos</h3>
+    <p>Selecciona tus asientos:</p>
+    <form action="/reserve-seats" method="post">
+        <input type="hidden" name="filmId" value="${film.id}">
+        <input type="hidden" name="userId" value="${currentUser.id}"> <!-- Asegúrate de que currentUser tenga el ID del usuario actual -->
+        <div class="row">
+            <#list 1..16 as seatId>
+            <div class="col-2" style="margin-bottom: 10px;">
+                <label for="seat${seatId}" style="margin-bottom: 0;">Asiento ${seatId}:</label>
+                <input type="checkbox" id="seat${seatId}" name="seats" value="${seatId}" style="margin-top: 0;">
+            </div>
+            <#if seatId % 4 == 0>
+        </div><div class="row">
+            </#if>
+            </#list>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Reservar</button>
+    </form>
 </div>
 
 <div class="container mt-5">
