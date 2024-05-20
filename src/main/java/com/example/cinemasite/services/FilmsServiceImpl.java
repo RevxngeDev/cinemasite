@@ -43,6 +43,7 @@ public class FilmsServiceImpl implements FilmsService {
     public Page<Films> searchFilms(String query, String genre, int page, int size) {
         return filmsRepository.search(query, genre, PageRequest.of(page, size));
     }
+
     @Transactional
     public void deleteSeatReservationsByFilmId(Long filmId) {
         seatReservationRepository.deleteByFilmId(filmId);

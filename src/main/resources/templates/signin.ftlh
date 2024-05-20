@@ -22,5 +22,6 @@
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 <p>No tienes una cuenta? <a href="/signUp">Crea una</a>.</p>
+<a href="/oauth2/authorization/google">Sign in with Google</a>
 </body>
 </html>

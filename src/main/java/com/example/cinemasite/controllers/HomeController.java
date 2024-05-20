@@ -8,8 +8,10 @@ import com.example.cinemasite.services.FilmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +31,30 @@ public class HomeController {
     @Autowired
     private UsersRepository usersRepository;
 
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/home";
+    }
+
     @GetMapping("/home")
-    public String getHomePage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails != null) {
-            Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+    public String getHomePage(Model model, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            Optional<User> optionalUser = Optional.empty();
+
+            if (principal instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) principal;
+                optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+            } else if (principal instanceof OidcUser) {
+                OidcUser oidcUser = (OidcUser) principal;
+                String email = oidcUser.getEmail();
+                optionalUser = usersRepository.findByEmail(email);
+            }
+
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 model.addAttribute("userName", user.getFirstName());
-                model.addAttribute("profilePicture", user.getProfilePicture()); // Agrega la imagen al modelo
+                model.addAttribute("profilePicture", user.getProfilePicture());
             }
         }
         return "home";

@@ -81,7 +81,7 @@
                 processData: false,
                 success: function (data) {
                     if (data.status === "success") {
-                        $("#profilePicture").attr("src", "/profilePicture/" + data.fileName);
+                        window.location.reload(); // Recarga la página
                     } else {
                         console.error("Error: " + data.message);
                     }
@@ -93,6 +93,5 @@
         });
     });
 </script>
-
 </body>
 </html>

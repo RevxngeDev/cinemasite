@@ -13,4 +13,6 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
     List<Long> findReservedSeatsByFilmId(Long filmId);
 
     void deleteByFilmId(Long filmId);
+
+    void deleteByUserId(Long userId);
 }

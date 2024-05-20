@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -194,7 +196,7 @@ public class FilmsController {
     }
 
     @GetMapping("/films/{id}")
-    public String getFilmPage(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+    public String getFilmPage(@PathVariable Long id, Model model, Authentication authentication) {
         Optional<Films> optionalFilm = filmsRepository.findById(id);
         if (optionalFilm.isPresent()) {
             Films film = optionalFilm.get();
@@ -206,8 +208,19 @@ public class FilmsController {
             model.addAttribute("comments", commentService.getCommentsByFilm(film));
 
             boolean userLikedFilm = false;
-            if (userDetails != null) {
-                Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+            if (authentication != null && authentication.isAuthenticated()) {
+                Object principal = authentication.getPrincipal();
+                Optional<User> optionalUser = Optional.empty();
+
+                if (principal instanceof UserDetails) {
+                    UserDetails userDetails = (UserDetails) principal;
+                    optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+                } else if (principal instanceof OidcUser) {
+                    OidcUser oidcUser = (OidcUser) principal;
+                    String email = oidcUser.getEmail();
+                    optionalUser = usersRepository.findByEmail(email);
+                }
+
                 if (optionalUser.isPresent()) {
                     Long userId = optionalUser.get().getId();
                     userLikedFilm = filmRatingService.hasUserLikedFilm(id, userId);
@@ -222,9 +235,10 @@ public class FilmsController {
         }
     }
 
+
     @PostMapping("/films/{id}/like")
-    public String likeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+    public String likeFilm(@PathVariable Long id, Authentication authentication) {
+        Optional<User> optionalUser = getUserFromAuthentication(authentication);
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
@@ -235,8 +249,8 @@ public class FilmsController {
     }
 
     @PostMapping("/films/{id}/dislike")
-    public String dislikeFilm(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+    public String dislikeFilm(@PathVariable Long id, Authentication authentication) {
+        Optional<User> optionalUser = getUserFromAuthentication(authentication);
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
@@ -247,9 +261,9 @@ public class FilmsController {
     }
 
     @PostMapping("/films/{id}/comment")
-    public String addComment(@PathVariable Long id, @RequestParam("text") String text, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails != null) {
-            Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
+    public String addComment(@PathVariable Long id, @RequestParam("text") String text, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            Optional<User> optionalUser = getUserFromAuthentication(authentication);
             Optional<Films> optionalFilm = filmsRepository.findById(id);
 
             if (optionalUser.isPresent() && optionalFilm.isPresent()) {
@@ -286,5 +300,24 @@ public class FilmsController {
         } else {
             return "redirect:/error";
         }
+    }
+
+
+    private Optional<User> getUserFromAuthentication(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Optional.empty();
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            return usersRepository.findByEmail(userDetails.getUsername());
+        } else if (principal instanceof OidcUser) {
+            OidcUser oidcUser = (OidcUser) principal;
+            String email = oidcUser.getEmail();
+            return usersRepository.findByEmail(email);
+        }
+
+        return Optional.empty();
     }
 }
