@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 public interface SeatReservationRepository extends JpaRepository<SeatReservation, Long> {
@@ -14,5 +15,6 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
 
     void deleteByFilmId(Long filmId);
 
+    @Transactional
     void deleteByUserId(Long userId);
 }

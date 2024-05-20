@@ -6,6 +6,7 @@ import com.example.cinemasite.repositores.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.example.cinemasite.dto.UserDto.userList;
@@ -24,12 +25,10 @@ public class UsersServiceImpl implements UsersService{
         return userList(usersRepository.findAll());
     }
 
-    @Override
+    @Transactional
     public boolean deleteUserById(Long id) {
         if (usersRepository.existsById(id)) {
-            // Eliminar las referencias en seat_reservations
             seatReservationRepository.deleteByUserId(id);
-            // Ahora eliminar el usuario
             usersRepository.deleteById(id);
             return true;
         }
