@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: aliceblue; /* gris claro */
+            background-color: aliceblue;
         }
     </style>
 </head>
@@ -17,6 +15,14 @@
 <div class="container mt-5">
     <h1 class="mb-4">Users</h1>
     <div class="mb-3">
+        <form action="/users" method="get" class="d-flex mb-3">
+            <select name="searchType" class="form-select me-2">
+                <option value="name">Nombre</option>
+                <option value="email">Email</option>
+            </select>
+            <input type="text" name="q" class="form-control me-2" placeholder="Buscar...">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
         <a href="/users?sort=asc" class="btn btn-primary">Ordenar por más antiguos</a>
         <a href="/users?sort=desc" class="btn btn-primary">Ordenar por más recientes</a>
     </div>

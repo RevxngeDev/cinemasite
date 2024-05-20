@@ -17,11 +17,22 @@ public class UsersController {
     private UsersService usersService;
 
     @GetMapping("/users")
-    public String getUsersPage(@RequestParam(name = "sort", required = false, defaultValue = "desc") String sort, Model model){
-        if ("asc".equals(sort)) {
-            model.addAttribute("usersList", usersService.getAllUsersOrderedByCreatedAtAsc());
+    public String getUsersPage(@RequestParam(name = "sort", required = false, defaultValue = "desc") String sort,
+                               @RequestParam(name = "searchType", required = false) String searchType,
+                               @RequestParam(name = "q", required = false) String query,
+                               Model model) {
+        if (query != null && !query.isEmpty()) {
+            if ("email".equals(searchType)) {
+                model.addAttribute("usersList", usersService.searchUsersByEmail(query));
+            } else {
+                model.addAttribute("usersList", usersService.searchUsersByName(query));
+            }
         } else {
-            model.addAttribute("usersList", usersService.getAllUsersOrderedByCreatedAtDesc());
+            if ("asc".equals(sort)) {
+                model.addAttribute("usersList", usersService.getAllUsersOrderedByCreatedAtAsc());
+            } else {
+                model.addAttribute("usersList", usersService.getAllUsersOrderedByCreatedAtDesc());
+            }
         }
         return "users";
     }

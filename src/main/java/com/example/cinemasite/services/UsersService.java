@@ -13,4 +13,8 @@ public interface UsersService {
     List<User> getAllUsersOrderedByCreatedAtDesc();
 
     List<User> getAllUsersOrderedByCreatedAtAsc();
+
+    List<User> searchUsersByName(String query);
+
+    List<User> searchUsersByEmail(String query);
 }

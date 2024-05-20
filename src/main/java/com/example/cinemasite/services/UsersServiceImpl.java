@@ -44,4 +44,12 @@ public class UsersServiceImpl implements UsersService{
         return usersRepository.findAllByOrderByCreatedAtAsc();
     }
 
+    public List<User> searchUsersByName(String query) {
+        return usersRepository.searchUsersByName(query);
+    }
+
+    public List<User> searchUsersByEmail(String query) {
+        return usersRepository.searchUsersByEmail(query);
+    }
+
 }
