@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,6 +51,7 @@ public class CustomOidcUserService extends OidcUserService {
                     .confirmCode(UUID.randomUUID().toString())
                     .state(State.CONFIRMED)
                     .phone("842348184")
+                    .createdAt(LocalDateTime.now())
                     // Aquí puedes establecer otros atributos del usuario según sea necesario
                     .build();
             userRepository.save(newUser);

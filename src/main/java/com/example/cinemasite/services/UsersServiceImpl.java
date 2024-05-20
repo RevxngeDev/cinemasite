@@ -1,6 +1,7 @@
 package com.example.cinemasite.services;
 
 import com.example.cinemasite.dto.UserDto;
+import com.example.cinemasite.models.User;
 import com.example.cinemasite.repositores.SeatReservationRepository;
 import com.example.cinemasite.repositores.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,14 @@ public class UsersServiceImpl implements UsersService{
             return true;
         }
         return false;
+    }
+
+    public List<User> getAllUsersOrderedByCreatedAtDesc() {
+        return usersRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public List<User> getAllUsersOrderedByCreatedAtAsc() {
+        return usersRepository.findAllByOrderByCreatedAtAsc();
     }
 
 }
