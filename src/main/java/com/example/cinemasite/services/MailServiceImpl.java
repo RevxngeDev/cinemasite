@@ -30,6 +30,7 @@ public class MailServiceImpl implements MailService{
 
     private final Template confirmMailTemplate;
     private final Template reservationMailTemplate;
+    private final Template resetPasswordMailTemplate;
 
     public MailServiceImpl() {
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
@@ -40,6 +41,7 @@ public class MailServiceImpl implements MailService{
         try {
             this.confirmMailTemplate = configuration.getTemplate("templates/confirm_mail.ftlh");
             this.reservationMailTemplate = configuration.getTemplate("templates/reservation_mail.ftlh");
+            this.resetPasswordMailTemplate = configuration.getTemplate("templates/reset_password_mail.ftlh");
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -57,6 +59,12 @@ public class MailServiceImpl implements MailService{
     public void sendReservationEmail(String email, String filmName, List<Long> seatIds) {
         String mailText = getReservationEmailText(filmName, seatIds);
         MimeMessagePreparator messagePreparator = getEmail(email, mailText, "Confirmación de Reserva");
+        javaMailSender.send(messagePreparator);
+    }
+    @Override
+    public void sendResetPasswordEmail(String email, String link) {
+        String mailText = getEmailText(resetPasswordMailTemplate, "reset_link", link);
+        MimeMessagePreparator messagePreparator = getEmail(email, mailText, "Restablecimiento de Contraseña");
         javaMailSender.send(messagePreparator);
     }
 

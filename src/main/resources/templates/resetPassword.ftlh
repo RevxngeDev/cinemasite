@@ -5,24 +5,22 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>SignIn</title>
+    <title>Reset Password</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 <body>
-<form action="/signIn" method="post">
+<form action="/reset-password" method="post">
+    <input type="hidden" name="token" value="${token}">
     <div class="mb-3">
-        <label for="email" class="form-label">Email address</label>
-        <input name="email" class="form-control" id="email" >
+        <label for="password" class="form-label">New Password</label>
+        <input name="password" type="password" class="form-control" id="password" >
     </div>
     <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input name="password" class="form-control" id="password">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input name="confirmPassword" type="password" class="form-control" id="confirmPassword">
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Reset Password</button>
 </form>
-<p>No tienes una cuenta? <a href="/signUp">Crea una</a>.</p>
-<a href="/oauth2/authorization/google">Sign in with Google</a>
-<p><a href="/forgot-password">¿Olvidaste tu contraseña?</a></p>
 </body>
 </html>
