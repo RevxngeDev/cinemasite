@@ -25,6 +25,9 @@ public class SignUpServiceImpl implements SignUpService{
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private SmsService smsService;
+
     @Override
     public void addUser(UserForm form) {
         User user = User.builder()
@@ -39,6 +42,7 @@ public class SignUpServiceImpl implements SignUpService{
                 .createdAt(LocalDateTime.now())
                 .build();
         usersRepository.save(user);
+        smsService.sendSms(form.getPhone(), "Welcome to Cinemasite!");
         mailService.sendEmailForConfirm(user.getEmail(), user.getConfirmCode());
     }
 }
