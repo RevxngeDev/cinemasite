@@ -74,4 +74,9 @@ public class FilmRatingServiceImpl implements FilmRatingService{
 
         return false;
     }
+
+    @Override
+    public Long countLikesByFilmId(Long filmId) {
+        return filmRatingRepository.countLikesByFilmId(filmId);
+    }
 }

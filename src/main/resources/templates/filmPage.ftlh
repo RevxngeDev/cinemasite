@@ -90,6 +90,7 @@
                         </form>
                     </#if>
                 </div>
+                <p class="mt-3">${likesCount} personas han dado "like" a esta película</p> <!-- Mostrar el número de likes -->
             </div>
             <div class="film-overview">
                 <h1>${film.name}</h1>

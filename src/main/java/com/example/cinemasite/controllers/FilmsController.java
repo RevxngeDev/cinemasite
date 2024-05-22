@@ -229,6 +229,10 @@ public class FilmsController {
             }
             model.addAttribute("userLikedFilm", userLikedFilm);
 
+            // Agregar el número de "likes" al modelo
+            Long likesCount = filmRatingService.countLikesByFilmId(id);
+            model.addAttribute("likesCount", likesCount);
+
             return "filmPage";
         } else {
             return "redirect:/home";
