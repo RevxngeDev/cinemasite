@@ -11,4 +11,7 @@ public interface CommentService {
     List<Comment> getCommentsByFilm(Films film);
 
     Comment addComment(Films film, User user, String text);
+
+    void deleteComment(Long commentId, Long userId);
+
 }

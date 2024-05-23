@@ -18,6 +18,39 @@
             text-align: center; /* Centra el texto del título */
             margin-top: 0.5rem; /* Añade un poco de espacio encima del título */
         }
+        .carousel-image-wrapper {
+            position: relative;
+            height: 600px; /* Adjust the height as needed */
+        }
+
+        .carousel-image-wrapper img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+
+        .carousel-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)); /* Agrega un desvanecimiento desde negro a transparente */
+        }
+        .carousel-caption {
+            left: 15%; /* Adjust this value to move it more or less to the left */
+            text-align: left; /* Align text to the left */
+        }
+
+        .carousel-caption h5 {
+            font-size: 3rem; /* Taño del título más grande */
+            font-weight: bold; /* Texto más grueso */
+        }
+
+        .carousel-caption p {
+            font-size: 1.2rem; /* Tamaño de la descripción un poco más grande */
+        }
     </style>
 </head>
 <body>
@@ -60,6 +93,46 @@
 </header>
 
 <main>
+    <h2>Top 3 Películas</h2>
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <#assign index = 0>
+            <#list topFilms as film>
+                <#if index < 3>
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="${index}" class="<#if index == 0>active</#if>" aria-current="true" aria-label="Slide ${index + 1}"></button>
+                    <#assign index = index + 1>
+                </#if>
+            </#list>
+        </div>
+        <div class="carousel-inner">
+            <#assign index = 0>
+            <#list topFilms as film>
+                <#if index < 3>
+                    <div class="carousel-item <#if index == 0>active</#if>">
+                        <div class="carousel-image-wrapper">
+                            <img src="/images/${film.picture}" class="d-block w-100" alt="${film.name}">
+                            <div class="carousel-image-overlay"></div> <!-- Superposición para el desvanecimiento -->
+                        </div>
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>${film.name}</h5>
+                            <p>${film.overView}</p>
+                            <a href="/films/${film.id}" class="btn btn-primary">Ver Película</a>
+                        </div>
+                    </div>
+                    <#assign index = index + 1>
+                </#if>
+            </#list>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
     <div class="container">
         <h2>Bienvenido a CinemaCity</h2>
         <form id="searchForm" class="mb-3">

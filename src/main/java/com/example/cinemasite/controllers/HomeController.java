@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -57,6 +58,8 @@ public class HomeController {
                 model.addAttribute("profilePicture", user.getProfilePicture());
             }
         }
+        List<Films> topFilms = filmsService.getTop3FilmsByLikes();
+        model.addAttribute("topFilms", topFilms);
         return "home";
     }
 

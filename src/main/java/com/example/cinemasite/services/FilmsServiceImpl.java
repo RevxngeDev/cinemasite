@@ -48,4 +48,9 @@ public class FilmsServiceImpl implements FilmsService {
     public void deleteSeatReservationsByFilmId(Long filmId) {
         seatReservationRepository.deleteByFilmId(filmId);
     }
+
+    @Override
+    public List<Films> getTop3FilmsByLikes() {
+        return filmsRepository.findTop3ByOrderByLikesCountDesc();
+    }
 }

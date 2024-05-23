@@ -19,4 +19,6 @@ public interface FilmsService {
   void deleteFilmById(Long id);
 
   void deleteSeatReservationsByFilmId(Long filmId);
+
+  List<Films> getTop3FilmsByLikes();
 }

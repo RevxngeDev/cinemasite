@@ -41,4 +41,7 @@ public class Films {
     @OneToMany(mappedBy = "film", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+    @Column(nullable = false)
+    private Long likesCount = 0L;
+
 }

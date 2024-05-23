@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.List;
 
 public interface FilmsRepository extends JpaRepository<Films, Long> {
     Optional<Films> findById(Long id);
@@ -19,4 +20,6 @@ public interface FilmsRepository extends JpaRepository<Films, Long> {
             "AND (:genre IS NULL OR :genre = '' OR :genre = 'ALL' OR film.type = :genre)")
     Page<Films> search(@Param("q") String query, @Param("genre") String genre, Pageable pageable);
 
+    @Query("SELECT f FROM Films f ORDER BY f.likesCount DESC")
+    List<Films> findTop3ByOrderByLikesCountDesc();
 }

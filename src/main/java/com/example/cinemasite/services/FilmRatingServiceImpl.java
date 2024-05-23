@@ -79,4 +79,26 @@ public class FilmRatingServiceImpl implements FilmRatingService{
     public Long countLikesByFilmId(Long filmId) {
         return filmRatingRepository.countLikesByFilmId(filmId);
     }
+
+    @Override
+    public void incrementLikesCount(Long filmId) {
+        Optional<Films> optionalFilm = filmsRepository.findById(filmId);
+        if (optionalFilm.isPresent()) {
+            Films film = optionalFilm.get();
+            Long currentLikes = film.getLikesCount() != null ? film.getLikesCount() : 0L;
+            film.setLikesCount(currentLikes + 1);
+            filmsRepository.save(film);
+        }
+    }
+
+    @Override
+    public void decrementLikesCount(Long filmId) {
+        Optional<Films> optionalFilm = filmsRepository.findById(filmId);
+        if (optionalFilm.isPresent()) {
+            Films film = optionalFilm.get();
+            Long currentLikes = film.getLikesCount() != null ? film.getLikesCount() : 0L;
+            film.setLikesCount(currentLikes > 0 ? currentLikes - 1 : 0);
+            filmsRepository.save(film);
+        }
+    }
 }

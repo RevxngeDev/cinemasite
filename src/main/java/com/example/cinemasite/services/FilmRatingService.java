@@ -7,4 +7,8 @@ public interface FilmRatingService {
     boolean hasUserLikedFilm(Long filmId, Long userId);
 
     Long countLikesByFilmId(Long filmId);
+
+    void incrementLikesCount(Long filmId);
+
+    void decrementLikesCount(Long filmId);
 }

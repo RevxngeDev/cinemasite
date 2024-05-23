@@ -92,6 +92,7 @@ public class FilmsController {
                     .overView(overview)
                     .youtubeLink(youtubeLink)
                     .price(price)
+                    .likesCount(0L)
                     .build();
             filmsRepository.save(film);
 
@@ -247,10 +248,12 @@ public class FilmsController {
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, true);
+            filmRatingService.incrementLikesCount(id);
         }
 
         return "redirect:/films/" + id;
     }
+
 
     @PostMapping("/films/{id}/dislike")
     public String dislikeFilm(@PathVariable Long id, Authentication authentication) {
@@ -259,6 +262,7 @@ public class FilmsController {
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, false);
+            filmRatingService.decrementLikesCount(id);
         }
 
         return "redirect:/films/" + id;
@@ -274,6 +278,19 @@ public class FilmsController {
                 User user = optionalUser.get();
                 Films film = optionalFilm.get();
                 commentService.addComment(film, user, text);
+            }
+        }
+        return "redirect:/films/" + id;
+    }
+    @PostMapping("/films/{id}/comments/{commentId}/delete")
+    public String deleteComment(@PathVariable Long id,
+                                @PathVariable Long commentId,
+                                Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            Optional<User> optionalUser = getUserFromAuthentication(authentication);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                commentService.deleteComment(commentId, user.getId());
             }
         }
         return "redirect:/films/" + id;

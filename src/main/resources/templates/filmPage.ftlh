@@ -150,9 +150,16 @@
     <h2>Comentarios</h2>
     <div class="comments-section">
         <#list comments as comment>
-            <div>
-                <p><strong>${comment.user.firstName} ${comment.user.lastName}</strong>:</p>
-                <p>${comment.text}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p><strong>${comment.user.firstName} ${comment.user.lastName}</strong>:</p>
+                    <p>${comment.text}</p>
+                </div>
+                <#if currentUser?has_content && currentUser.id == comment.user.id>
+                    <form action="/films/${film.id}/comments/${comment.id}/delete" method="post">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </#if>
             </div>
         </#list>
     </div>
