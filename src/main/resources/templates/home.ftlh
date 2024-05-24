@@ -38,7 +38,7 @@
         }
         .carousel-image-wrapper {
             position: relative;
-            height: 600px; /* Adjust the height as needed */
+            height: 600px;
         }
         .carousel-image-wrapper img {
             filter: brightness(1.0);
@@ -64,12 +64,12 @@
             color: #e0e0e0;
         }
         .carousel-caption h5 {
-            font-size: 3rem; /* Taño del título más grande */
-            font-weight: bold; /* Texto más grueso */
+            font-size: 3rem;
+            font-weight: bold;
         }
         .carousel-caption {
-            left: 15%; /* Adjust this value to move it more or less to the left */
-            text-align: left; /* Align text to the left */
+            left: 15%;
+            text-align: left;
         }
         .carousel-control-prev-icon, .carousel-control-next-icon {
             filter: invert(1);
@@ -288,7 +288,6 @@
             console.error("Error fetching films: ", textStatus, errorThrown);
         });
     }
-
 </script>
 </body>
 </html>

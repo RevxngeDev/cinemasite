@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Add Film</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .film-container {
@@ -86,7 +85,6 @@
                     <td>${film.type}</td>
                     <td>${film.price}</td>
                     <td>
-                        <!-- Aquí puedes agregar botones de acciones, como editar o eliminar -->
                         <form action="/films/${film.id}/delete" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta película?');">
                             <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
@@ -99,7 +97,6 @@
         </table>
     </div>
 </div>
-<!-- Modal para Editar Película -->
 <div class="modal fade" id="editFilmModal" tabindex="-1" role="dialog" aria-labelledby="editFilmModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -150,7 +147,6 @@
         </div>
     </div>
 </div>
-<!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>

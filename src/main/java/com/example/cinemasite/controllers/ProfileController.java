@@ -42,7 +42,6 @@ public class ProfileController {
             Object principal = authentication.getPrincipal();
 
             if (principal instanceof UserDetails) {
-                // Usuario autenticado desde la base de datos
                 UserDetails userDetails = (UserDetails) principal;
                 Optional<User> optionalUser = usersRepository.findByEmail(userDetails.getUsername());
 
@@ -56,7 +55,6 @@ public class ProfileController {
                     return "error";
                 }
             } else if (principal instanceof OidcUser) {
-                // Usuario autenticado con Google OAuth
                 OidcUser oidcUser = (OidcUser) principal;
                 String email = oidcUser.getEmail();
 

@@ -23,7 +23,6 @@ public class ConfirmController {
             usersRepository.save(user);
             return new ModelAndView("confirmacion");
         } else {
-
             return new ModelAndView("error");
         }
     }

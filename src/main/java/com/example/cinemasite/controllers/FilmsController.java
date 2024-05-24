@@ -98,7 +98,6 @@ public class FilmsController {
             filmsRepository.deleteById(id);
             return new RedirectView("/films", true);
         } catch (Exception e) {
-            // Manejo de errores
             return new RedirectView("/error", true); // Puedes redireccionar a una página de error
         }
     }
@@ -191,7 +190,6 @@ public class FilmsController {
             }
             model.addAttribute("userLikedFilm", userLikedFilm);
 
-            // Agregar el número de "likes" al modelo
             Long likesCount = filmRatingService.countLikesByFilmId(id);
             model.addAttribute("likesCount", likesCount);
 
@@ -200,7 +198,6 @@ public class FilmsController {
             return "redirect:/home";
         }
     }
-
 
     @PostMapping("/films/{id}/like")
     @ResponseBody
@@ -221,7 +218,6 @@ public class FilmsController {
 
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/films/{id}/dislike")
     @ResponseBody
@@ -313,7 +309,10 @@ public class FilmsController {
             return "redirect:/error";
         }
     }
-
+    @GetMapping("/reservationSuccess")
+    public String reservationSuccess() {
+        return "reservationSuccess";
+    }
 
     private Optional<User> getUserFromAuthentication(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

@@ -23,13 +23,13 @@
         margin: 0;
         overflow-y: scroll;
         opacity: 1;
-        background-color: #f8f9fa; /* Color de fondo claro */
+        background-color: #f8f9fa;
     }
 
     a {
         cursor: pointer;
         text-decoration: none;
-        color: #495057; /* Color de enlace oscuro */
+        color: #495057;
     }
 
     .navbar-expand .navbar-nav {
@@ -42,7 +42,7 @@
 
     h4 {
         font-size: 1.275rem;
-        color: #495057; /* Color de texto oscuro */
+        color: #495057;
     }
 
     .wrapper {
@@ -51,14 +51,14 @@
     }
 
     #sidebar {
-        background: #f1f1f1; /* Fondo de la barra lateral */
+        background: #f1f1f1;
         max-width: 264px;
         min-width: 264px;
         transition: all 0.35s ease-in-out;
     }
 
     .main {
-        background: #f1f1f1; /* Fondo del contenido principal */
+        background: #f1f1f1;
         display: flex;
         flex-direction: column;
         min-height: 100vh;
@@ -73,19 +73,18 @@
     }
 
     .sidebar-logo a {
-        color: #495057; /* Color de texto oscuro */
+        color: #495057;
         font-size: 1.15rem;
         font-weight: 600;
     }
     .footer {
-        text-align: center; /* Centrar el contenido del footer */
-        font-size: 2rem; /* Tamaño de fuente más grande */
+        text-align: center;
+        font-size: 2rem;
     }
 </style>
 <body>
 <div class="wrapper">
     <aside id="sidebar" class="js-sidebar">
-        <!-- Content For Sidebar -->
         <div class="h-100">
             <div class="sidebar-logo">
                 <a href="#">CinemaCity</a>

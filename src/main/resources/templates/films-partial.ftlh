@@ -11,7 +11,6 @@
     </div>
 </#list>
 
-<!-- Paginación -->
 <nav aria-label="Page navigation" id="paginationNav">
     <ul class="pagination justify-content-center">
         <li class="page-item<#if currentPage == 0> disabled</#if>">

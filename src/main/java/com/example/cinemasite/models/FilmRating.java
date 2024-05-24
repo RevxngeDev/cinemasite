@@ -26,5 +26,5 @@ public class FilmRating {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private boolean liked; // true for like, false for dislike
+    private boolean liked;
 }

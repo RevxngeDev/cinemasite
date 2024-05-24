@@ -47,7 +47,7 @@ public class ResetPasswordController {
             return "redirect:/reset-password?token=" + token + "&error=invalidToken";
         }
 
-        user.setPassword(passwordEncoder.encode(password)); // Asegúrate de cifrar la contraseña
+        user.setPassword(passwordEncoder.encode(password));
         usersRepository.save(user);
 
         return "redirect:/resetPasswordSuccess";
