@@ -5,17 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bootstrap Admin Dashboard</title>
+    <title>Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css">
     <script src="https://kit.fontawesome.com/ae360af17e.js" crossorigin="anonymous"></script>
 </head>
-
-<script>
-    const sidebarToggle = document.querySelector("#sidebar-toggle");
-    sidebarToggle.addEventListener("click",function(){
-        document.querySelector("#sidebar").classList.toggle("collapsed");
-    });
-</script>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
     *,
@@ -84,6 +77,10 @@
         font-size: 1.15rem;
         font-weight: 600;
     }
+    .footer {
+        text-align: center; /* Centrar el contenido del footer */
+        font-size: 2rem; /* Tamaño de fuente más grande */
+    }
 </style>
 <body>
 <div class="wrapper">
@@ -91,7 +88,7 @@
         <!-- Content For Sidebar -->
         <div class="h-100">
             <div class="sidebar-logo">
-                <a href="#">CineCity</a>
+                <a href="#">CinemaCity</a>
             </div>
             <ul class="sidebar-nav">
                 <li class="sidebar-header">
@@ -131,7 +128,7 @@
                                     <div class="col-6">
                                         <div class="p-3 m-1">
                                             <h4>Welcome Back, Admin</h4>
-                                            <p class="mb-0">Admin Dashboard, CineCity</p>
+                                            <p class="mb-0">Admin Dashboard, CinemaCity</p>
                                         </div>
                                     </div>
                                     <div class="col-6 align-self-end text-end">
@@ -150,8 +147,8 @@
                 <div class="row text-muted">
                     <div class="col-6 text-start">
                         <p class="mb-0">
-                            <a href="#" class="text-muted">
-                                <strong>CineCity</strong>
+                            <a href="/home" class="text-muted">
+                                <strong> -> CinemaCity</strong>
                             </a>
                         </p>
                     </div>

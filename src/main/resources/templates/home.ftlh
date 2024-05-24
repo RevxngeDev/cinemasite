@@ -6,57 +6,107 @@
     <title>CinemaCity</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .navbar, .footer {
+            background-color: #1f1f1f;
+        }
+        .navbar-brand, .nav-link {
+            color: #e0e0e0 !important;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: #bb86fc !important;
+        }
+        .btn-outline-primary {
+            border-color: #bb86fc;
+            color: #bb86fc;
+        }
+        .btn-outline-primary:hover {
+            background-color: #bb86fc;
+            color: #121212;
+        }
         .card-custom {
-            width: 20rem; /* Ajusta el ancho de la tarjeta */
-            height: 100%;
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            border: 1px solid #bb86fc;
         }
         .card-img-top-custom {
-            height: 25rem; /* Ajusta la altura de la imagen */
+            height: 25rem;
             object-fit: cover;
-        }
-        .card-title {
-            text-align: center; /* Centra el texto del título */
-            margin-top: 0.5rem; /* Añade un poco de espacio encima del título */
         }
         .carousel-image-wrapper {
             position: relative;
             height: 600px; /* Adjust the height as needed */
         }
-
         .carousel-image-wrapper img {
+            filter: brightness(1.0);
             height: 100%;
             width: 100%;
             object-fit: cover;
-            filter: brightness(0.7);
         }
-
+        .carousel-caption h5 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #bb86fc;
+        }
         .carousel-image-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)); /* Agrega un desvanecimiento desde negro a transparente */
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+        }
+        .carousel-caption p {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+        }
+        .carousel-caption h5 {
+            font-size: 3rem; /* Taño del título más grande */
+            font-weight: bold; /* Texto más grueso */
         }
         .carousel-caption {
             left: 15%; /* Adjust this value to move it more or less to the left */
             text-align: left; /* Align text to the left */
         }
-
-        .carousel-caption h5 {
-            font-size: 3rem; /* Taño del título más grande */
-            font-weight: bold; /* Texto más grueso */
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            filter: invert(1);
         }
-
-        .carousel-caption p {
-            font-size: 1.2rem; /* Tamaño de la descripción un poco más grande */
+        .btn-primary {
+            background-color: #bb86fc;
+            border-color: #bb86fc;
+        }
+        .btn-primary:hover {
+            background-color: #e0e0e0;
+            color: #121212;
+            border-color: #e0e0e0;
+        }
+        .input-group .form-control, .input-group .form-select {
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            border: 1px solid #bb86fc;
+        }
+        .pagination .page-link {
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            border: 1px solid #bb86fc;
+        }
+        .pagination .page-link:hover {
+            background-color: #bb86fc;
+            color: #121212;
+        }
+        .pagination .active .page-link {
+            background-color: #bb86fc;
+            border-color: #bb86fc;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="/home">CinemaCity</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,21 +117,26 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/home">Home</a>
                     </li>
+                    <#if role == 'ADMIN'>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
+                        </li>
+                    </#if>
+                </ul>
                 </ul>
                 <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <span class="nav-link active">
                             <#if userName??>
-                             <!-- Si hay una foto de perfil, mostrarla -->
-                             <#if profilePicture??>
-                                 <img src="/profilePicture/${profilePicture}" alt="Profile Picture" style="width: 35px; height: 35px; border-radius: 50%;">
-                             </#if>
-                                 Bienvenido, ${userName}
+                                <#if profilePicture??>
+                                    <img src="/profilePicture/${profilePicture}" alt="Profile Picture" style="width: 35px; height: 35px; border-radius: 50%;">
+                                </#if>
+                                Bienvenido, ${userName}
                             </#if>
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active btn btn-success" aria-current="page" href="/profile">Profile</a>
+                        <a class="nav-link active btn btn-outline-primary" aria-current="page" href="/profile">Profile</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/logout">logOut</a>
@@ -93,7 +148,7 @@
 </header>
 
 <main>
-    <h2>Top 3 Películas</h2>
+    <h2 class="text-center my-4">Top 3 Películas</h2>
     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <#assign index = 0>
@@ -111,7 +166,7 @@
                     <div class="carousel-item <#if index == 0>active</#if>">
                         <div class="carousel-image-wrapper">
                             <img src="/images/${film.picture}" class="d-block w-100" alt="${film.name}">
-                            <div class="carousel-image-overlay"></div> <!-- Superposición para el desvanecimiento -->
+                            <div class="carousel-image-overlay"></div>
                         </div>
                         <div class="carousel-caption d-none d-md-block">
                             <h5>${film.name}</h5>
@@ -133,8 +188,8 @@
         </button>
     </div>
 
-    <div class="container">
-        <h2>Bienvenido a CinemaCity</h2>
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Bienvenido a CinemaCity</h2>
         <form id="searchForm" class="mb-3">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" placeholder="Buscar películas...">
@@ -151,22 +206,18 @@
             </div>
         </form>
         <div class="row" id="filmList">
-            <!-- Aquí se mostrarán las películas -->
         </div>
 
-        <!-- Paginación -->
         <nav aria-label="Page navigation" id="paginationNav">
-            <!-- Aquí se mostrará la paginación -->
         </nav>
     </div>
 </main>
 
-<footer class="footer mt-auto py-3 bg-body-tertiary text-center">
+<footer class="footer mt-auto py-3 text-center">
     <div class="container">
         <span class="text-muted">© 2024 CinemaCity. Todos los derechos reservados.</span>
     </div>
 </footer>
-
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -241,4 +292,3 @@
 </script>
 </body>
 </html>
-

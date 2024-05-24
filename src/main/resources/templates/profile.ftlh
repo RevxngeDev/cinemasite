@@ -4,23 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Profile</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
         .profile-container {
             max-width: 600px;
             margin: auto;
             padding: 20px;
-            border: 1px solid #e9ecef;
+            border: 1px solid #bb86fc;
             border-radius: 10px;
-            background-color: #f8f9fa;
+            background-color: #1f1f1f;
             margin-top: 50px;
         }
-
         .profile-image {
-            max-width: 200px; /* Ajusta el tamaño según lo necesites */
+            max-width: 200px;
             height: auto;
             margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #bb86fc;
+            border-color: #bb86fc;
+        }
+        .btn-primary:hover {
+            background-color: #e0e0e0;
+            color: #121212;
+            border-color: #e0e0e0;
         }
     </style>
 </head>
@@ -28,10 +39,9 @@
 <div class="container">
     <div class="profile-container">
         <h1 class="text-center">${userName}</h1>
-        <!-- Mostrar la imagen -->
         <div class="text-center">
             <#if profilePicture??>
-            <img class="profile-image" id="profilePicture" src="/profilePicture/${profilePicture}" alt="Profile Picture">
+                <img class="profile-image" id="profilePicture" src="/profilePicture/${profilePicture}" alt="Profile Picture">
             <#else>
                 <p>User has no profile picture.</p>
             </#if>
@@ -64,9 +74,8 @@
     </div>
 </div>
 
-<!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     $(document).ready(function () {
         $("#uploadButton").click(function () {
@@ -81,7 +90,7 @@
                 processData: false,
                 success: function (data) {
                     if (data.status === "success") {
-                        window.location.reload(); // Recarga la página
+                        window.location.reload();
                     } else {
                         console.error("Error: " + data.message);
                     }
@@ -95,3 +104,4 @@
 </script>
 </body>
 </html>
+

@@ -27,6 +27,7 @@ public class User {
     private String lastName;
     private String phone;
 
+    @Enumerated(value = EnumType.STRING)
     private Role role;
 
     private String profilePicture;

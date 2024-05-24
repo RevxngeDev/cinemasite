@@ -56,6 +56,7 @@ public class HomeController {
                 User user = optionalUser.get();
                 model.addAttribute("userName", user.getFirstName());
                 model.addAttribute("profilePicture", user.getProfilePicture());
+                model.addAttribute("role", user.getRole().name());
             }
         }
         List<Films> topFilms = filmsService.getTop3FilmsByLikes();

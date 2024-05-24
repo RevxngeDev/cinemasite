@@ -76,26 +76,10 @@ public class FilmsController {
                                                        @RequestParam("type") Type type,
                                                        @RequestParam("overview") String overview,
                                                        @RequestParam("youtubeLink") String youtubeLink,
-                                                       @RequestParam("price") Double price) { // Nuevo parámetro
+                                                       @RequestParam("price") Double price) {
         Map<String, String> response = new HashMap<>();
         try {
-
-            String fileName = picture.getOriginalFilename();
-            String filePath = storagePath + File.separator + fileName;
-            File dest = new File(filePath);
-            picture.transferTo(dest);
-
-            Films film = Films.builder()
-                    .name(name)
-                    .picture(fileName)
-                    .type(type)
-                    .overView(overview)
-                    .youtubeLink(youtubeLink)
-                    .price(price)
-                    .likesCount(0L)
-                    .build();
-            filmsRepository.save(film);
-
+            filmsService.addFilm(name, picture, type, overview, youtubeLink, price, storagePath);
             response.put("status", "success");
             response.put("message", "Film added successfully");
             return ResponseEntity.ok().body(response);
@@ -145,32 +129,10 @@ public class FilmsController {
                                                           @RequestParam("price") Double price) {
         Map<String, String> response = new HashMap<>();
         try {
-            Optional<Films> optionalFilm = filmsRepository.findById(id);
-            if (optionalFilm.isPresent()) {
-                Films film = optionalFilm.get();
-                film.setName(name);
-                film.setType(type);
-                film.setOverView(overview);
-                film.setYoutubeLink(youtubeLink);
-                film.setPrice(price);
-
-                if (picture != null && !picture.isEmpty()) {
-                    String fileName = picture.getOriginalFilename();
-                    String filePath = storagePath + File.separator + fileName;
-                    File dest = new File(filePath);
-                    picture.transferTo(dest);
-                    film.setPicture(fileName);
-                }
-
-                filmsRepository.save(film);
-                response.put("status", "success");
-                response.put("message", "Film updated successfully");
-                return ResponseEntity.ok().body(response);
-            } else {
-                response.put("status", "error");
-                response.put("message", "Film not found");
-                return ResponseEntity.status(404).body(response);
-            }
+            filmsService.updateFilm(id, name, picture, type, overview, youtubeLink, price, storagePath);
+            response.put("status", "success");
+            response.put("message", "Film updated successfully");
+            return ResponseEntity.ok().body(response);
         } catch (IOException e) {
             e.printStackTrace();
             response.put("status", "error");
@@ -178,7 +140,6 @@ public class FilmsController {
             return ResponseEntity.status(500).body(response);
         }
     }
-
 
     @GetMapping("/images/{filename:.+}")
     @ResponseBody

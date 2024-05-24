@@ -4,47 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${film.name}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/28eab93eea.js" crossorigin="anonymous"></script>
     <style>
-        @import url("https://fonts.googleapis.com/css?family=Lato&display=swap");
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
         .film-content {
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alinea la parte superior de los elementos */
+            align-items: flex-start;
         }
         .film-img {
-            max-width: 300px; /* Ajusta este valor según tus necesidades */
-            margin-right: 20px; /* Ajusta el espacio entre la imagen y el texto si es necesario */
+            max-width: 300px;
+            margin-right: 20px;
             margin-bottom: 20px;
         }
         .film-overview {
-            max-width: 400px; /* Ajusta este valor según tus necesidades */
+            max-width: 400px;
         }
         .comments-section {
-            max-height: 300px; /* Ajusta este valor según tus necesidades */
+            max-height: 300px;
             overflow-y: scroll;
-            border: 1px solid #ccc;
+            border: 1px solid #bb86fc;
             padding: 10px;
             margin-top: 20px;
+            background-color: #1f1f1f;
         }
         .video {
-            max-width: 800px; /* Ajusta el ancho máximo según tus preferencias */
-            margin: auto; /* Centra horizontalmente */
+            max-width: 800px;
+            margin: auto;
         }
-
         .video iframe {
-            width: 100%; /* Ajusta el ancho al 100% */
-            height: 450px; /* Ajusta la altura según tus preferencias */
-            border: none; /* Elimina el borde del iframe */
+            width: 100%;
+            height: 450px;
+            border: none;
         }
         .seat-layout {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
         }
-
         .seat {
             margin: 5px;
         }
@@ -55,21 +56,28 @@
         }
         .screen {
             background-color: grey;
-            height: 80px; /* Reduciendo la altura */
-            width: 40%; /* Ajustando el ancho */
-            margin: 15px auto; /* Centrando horizontalmente */
-            transform: perspective(1000px) rotateX(-30deg); /* Añadiendo perspectiva y rotación */
+            height: 80px;
+            width: 40%;
+            margin: 15px auto;
+            transform: perspective(1000px) rotateX(-30deg);
             box-shadow: 0 3px 10px rgba(255, 255, 255, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-
         .reserve-btn-container {
             display: flex;
             justify-content: center;
             width: 100%;
+        }
+        .btn-primary, .btn-danger, .btn-success {
+            background-color: #bb86fc;
+            border-color: #bb86fc;
+        }
+        .btn-primary:hover, .btn-danger:hover, .btn-success:hover {
+            background-color: #e0e0e0;
+            color: #121212;
+            border-color: #e0e0e0;
         }
     </style>
 </head>
@@ -82,7 +90,7 @@
                 <div>
                     <#if userLikedFilm>
                         <form action="/films/${film.id}/dislike" method="post">
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-thumbs-down"></i></i> Dislike</button>
+                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-thumbs-down"></i> Dislike</button>
                         </form>
                     <#else>
                         <form action="/films/${film.id}/like" method="post">
@@ -90,7 +98,7 @@
                         </form>
                     </#if>
                 </div>
-                <p class="mt-3">${likesCount} personas han dado "like" a esta película</p> <!-- Mostrar el número de likes -->
+                <p class="mt-3">${likesCount} personas han dado "like" a esta película</p>
             </div>
             <div class="film-overview">
                 <h1>${film.name}</h1>
@@ -110,25 +118,23 @@
     </#if>
 </div>
 
-<!-- Mostrar precio de la película -->
 <h2 class="text-center">${film.name}</h2>
-<p class="text-center"><strong>Precio por asiento:</strong> $${film.price}</p> <!-- Mostrar precio por asiento -->
+<p class="text-center"><strong>Precio por asiento:</strong> $${film.price}</p>
 
-<!-- Formato de reserva de asientos -->
 <div class="reservation-container">
     <h3>Reserva de Asientos</h3>
     <p>Selecciona tus asientos:</p>
     <div class="screen">Screen</div>
     <form action="/reserve-seats" method="post">
         <input type="hidden" name="filmId" value="${film.id}">
-        <input type="hidden" name="userId" value="${currentUser.id}"> <!-- Asegúrate de que currentUser tenga el ID del usuario actual -->
+        <input type="hidden" name="userId" value="${currentUser.id}">
         <div class="seat-layout">
             <#list 1..16 as seatId>
             <div class="seat">
                 <label for="seat${seatId}" style="margin-bottom: 0;">${seatId}</label>
                 <input type="checkbox" id="seat${seatId}" name="seats" value="${seatId}" style="margin-top: 0;" class="seat-checkbox"
                        data-price="${film.price}"
-                <#if reservedSeats?seq_contains(seatId)>disabled</#if>>
+                       <#if reservedSeats?seq_contains(seatId)>disabled</#if>>
             </div>
             <#if seatId % 4 == 0>
         </div><div class="seat-layout">
@@ -141,7 +147,6 @@
     </form>
 </div>
 
-<!-- Área de visualización del total acumulado -->
 <div class="total-container text-center mt-3">
     <h4>Total: $<span id="totalAmount">0.00</span></h4>
 </div>
@@ -172,10 +177,7 @@
     </#if>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-<!-- Script para calcular el total -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
         const checkboxes = document.querySelectorAll('.seat-checkbox');
@@ -186,7 +188,7 @@
                 let total = 0;
                 checkboxes.forEach(cb => {
                     if (cb.checked) {
-                        total += parseFloat(cb.getAttribute('data-price')); // Usar getAttribute para obtener el precio
+                        total += parseFloat(cb.getAttribute('data-price'));
                     }
                 });
                 totalAmountElement.textContent = total.toFixed(2);
@@ -196,4 +198,5 @@
 </script>
 </body>
 </html>
+
 

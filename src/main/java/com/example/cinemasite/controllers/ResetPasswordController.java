@@ -21,6 +21,10 @@ public class ResetPasswordController {
 
     @GetMapping("/reset-password")
     public String showResetPasswordPage(@RequestParam("token") String token, Model model) {
+        User user = usersRepository.findByConfirmCode(token);
+        if (user == null) {
+            return "redirect:/error?message=invalidToken";
+        }
         model.addAttribute("token", token);
         return "resetPassword";
     }
@@ -30,18 +34,17 @@ public class ResetPasswordController {
         return "resetPasswordSuccess";
     }
 
-
     @PostMapping("/reset-password")
     public String handleResetPassword(@RequestParam("token") String token,
                                       @RequestParam("password") String password,
                                       @RequestParam("confirmPassword") String confirmPassword) {
         if (!password.equals(confirmPassword)) {
-            return "redirect:/reset-password?token=" + token + "&error";
+            return "redirect:/reset-password?token=" + token + "&error=passwordMismatch";
         }
 
         User user = usersRepository.findByConfirmCode(token);
         if (user == null) {
-            return "redirect:/reset-password?token=" + token + "&invalid";
+            return "redirect:/reset-password?token=" + token + "&error=invalidToken";
         }
 
         user.setPassword(passwordEncoder.encode(password)); // Asegúrate de cifrar la contraseña
@@ -50,6 +53,7 @@ public class ResetPasswordController {
         return "redirect:/resetPasswordSuccess";
     }
 }
+
 
 
 
