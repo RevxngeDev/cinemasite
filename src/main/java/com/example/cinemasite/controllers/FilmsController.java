@@ -203,34 +203,50 @@ public class FilmsController {
 
 
     @PostMapping("/films/{id}/like")
-    public String likeFilm(@PathVariable Long id, Authentication authentication) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> likeFilm(@PathVariable Long id, Authentication authentication) {
         Optional<User> optionalUser = getUserFromAuthentication(authentication);
+        Map<String, Object> response = new HashMap<>();
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, true);
             filmRatingService.incrementLikesCount(id);
+            Long likesCount = filmRatingService.countLikesByFilmId(id);
+            response.put("status", "success");
+            response.put("likesCount", likesCount);
+        } else {
+            response.put("status", "error");
         }
 
-        return "redirect:/films/" + id;
+        return ResponseEntity.ok(response);
     }
 
 
     @PostMapping("/films/{id}/dislike")
-    public String dislikeFilm(@PathVariable Long id, Authentication authentication) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> dislikeFilm(@PathVariable Long id, Authentication authentication) {
         Optional<User> optionalUser = getUserFromAuthentication(authentication);
+        Map<String, Object> response = new HashMap<>();
 
         if (optionalUser.isPresent()) {
             Long userId = optionalUser.get().getId();
             filmRatingService.rateFilm(id, userId, false);
             filmRatingService.decrementLikesCount(id);
+            Long likesCount = filmRatingService.countLikesByFilmId(id);
+            response.put("status", "success");
+            response.put("likesCount", likesCount);
+        } else {
+            response.put("status", "error");
         }
 
-        return "redirect:/films/" + id;
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/films/{id}/comment")
-    public String addComment(@PathVariable Long id, @RequestParam("text") String text, Authentication authentication) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> addComment(@PathVariable Long id, @RequestParam("text") String text, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
         if (authentication != null && authentication.isAuthenticated()) {
             Optional<User> optionalUser = getUserFromAuthentication(authentication);
             Optional<Films> optionalFilm = filmsRepository.findById(id);
@@ -238,23 +254,37 @@ public class FilmsController {
             if (optionalUser.isPresent() && optionalFilm.isPresent()) {
                 User user = optionalUser.get();
                 Films film = optionalFilm.get();
-                commentService.addComment(film, user, text);
+                Comment comment = commentService.addComment(film, user, text);
+                response.put("status", "success");
+                response.put("comment", comment);
+            } else {
+                response.put("status", "error");
             }
+        } else {
+            response.put("status", "error");
         }
-        return "redirect:/films/" + id;
+        return ResponseEntity.ok(response);
     }
+
     @PostMapping("/films/{id}/comments/{commentId}/delete")
-    public String deleteComment(@PathVariable Long id,
-                                @PathVariable Long commentId,
-                                Authentication authentication) {
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteComment(@PathVariable Long id,
+                                                             @PathVariable Long commentId,
+                                                             Authentication authentication) {
+        Map<String, String> response = new HashMap<>();
         if (authentication != null && authentication.isAuthenticated()) {
             Optional<User> optionalUser = getUserFromAuthentication(authentication);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 commentService.deleteComment(commentId, user.getId());
+                response.put("status", "success");
+            } else {
+                response.put("status", "error");
             }
+        } else {
+            response.put("status", "error");
         }
-        return "redirect:/films/" + id;
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/reserve-seats")
@@ -278,7 +308,7 @@ public class FilmsController {
 
             mailService.sendReservationEmail(user.getEmail(), film.getName(), seatIds);
 
-            return "redirect:/films/" + filmId;
+            return "redirect:/reservationSuccess";
         } else {
             return "redirect:/error";
         }

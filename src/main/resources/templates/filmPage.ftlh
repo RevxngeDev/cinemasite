@@ -6,6 +6,7 @@
     <title>${film.name}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/28eab93eea.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <style>
         body {
             background-color: #121212;
@@ -87,18 +88,14 @@
         <div class="film-content">
             <div class="text-center">
                 <img src="/images/${film.picture}" class="img-fluid film-img" alt="${film.name}">
-                <div>
+                <div id="like-dislike-buttons">
                     <#if userLikedFilm>
-                        <form action="/films/${film.id}/dislike" method="post">
-                            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-thumbs-down"></i> Dislike</button>
-                        </form>
+                        <button id="dislike-btn" class="btn btn-danger"><i class="fa-solid fa-thumbs-down"></i> Dislike</button>
                     <#else>
-                        <form action="/films/${film.id}/like" method="post">
-                            <button type="submit" class="btn btn-success"><i class="fa-solid fa-thumbs-up"></i> Like</button>
-                        </form>
+                        <button id="like-btn" class="btn btn-success"><i class="fa-solid fa-thumbs-up"></i> Like</button>
                     </#if>
                 </div>
-                <p class="mt-3">${likesCount} personas han dado "like" a esta película</p>
+                <p class="mt-3"><span id="likes-count">${likesCount}</span> personas han dado "like" a esta película</p>
             </div>
             <div class="film-overview">
                 <h1>${film.name}</h1>
@@ -153,33 +150,79 @@
 
 <div class="container mt-5">
     <h2>Comentarios</h2>
-    <div class="comments-section">
+    <div class="comments-section" id="comments-section">
         <#list comments as comment>
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center comment" data-comment-id="${comment.id}">
                 <div>
                     <p><strong>${comment.user.firstName} ${comment.user.lastName}</strong>:</p>
                     <p>${comment.text}</p>
                 </div>
                 <#if currentUser?has_content && currentUser.id == comment.user.id>
-                    <form action="/films/${film.id}/comments/${comment.id}/delete" method="post">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
+                    <button class="btn btn-danger btn-sm delete-comment-btn">Eliminar</button>
                 </#if>
             </div>
         </#list>
     </div>
 
     <#if currentUser??>
-        <form action="/films/${film.id}/comment" method="post" class="mt-3">
+        <form id="add-comment-form" class="mt-3">
             <textarea name="text" rows="3" class="form-control" required></textarea><br>
             <button type="submit" class="btn btn-primary">Añadir comentario</button>
         </form>
     </#if>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+    $(document).ready(function () {
+        function updateLikeDislikeButtons(liked) {
+            if (liked) {
+                $('#like-dislike-buttons').html('<button id="dislike-btn" class="btn btn-danger"><i class="fa-solid fa-thumbs-down"></i> Dislike</button>');
+            } else {
+                $('#like-dislike-buttons').html('<button id="like-btn" class="btn btn-success"><i class="fa-solid fa-thumbs-up"></i> Like</button>');
+            }
+        }
+
+        $(document).on('click', '#like-btn', function () {
+            $.post("/films/${film.id}/like", function (data) {
+                if (data.status === "success") {
+                    updateLikeDislikeButtons(true);
+                    $('#likes-count').text(data.likesCount);
+                }
+            });
+        });
+
+        $(document).on('click', '#dislike-btn', function () {
+            $.post("/films/${film.id}/dislike", function (data) {
+                if (data.status === "success") {
+                    updateLikeDislikeButtons(false);
+                    $('#likes-count').text(data.likesCount);
+                }
+            });
+        });
+
+        $('#add-comment-form').submit(function (event) {
+            event.preventDefault();
+            var text = $(this).find('textarea[name="text"]').val();
+            $.post("/films/${film.id}/comment", {text: text}, function (data) {
+                if (data.status === "success") {
+                    var comment = data.comment;
+                    var newComment = '<div class="d-flex justify-content-between align-items-center comment" data-comment-id="' + comment.id + '">';
+                    newComment += '<div><p><strong>' + comment.user.firstName + ' ' + comment.user.lastName + '</strong>:</p><p>' + comment.text + '</p></div>';
+                    newComment += '<button class="btn btn-danger btn-sm delete-comment-btn">Eliminar</button></div>';
+                    $('#comments-section').append(newComment);
+                    $('#add-comment-form')[0].reset();
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-comment-btn', function () {
+            var commentId = $(this).closest('.comment').data('comment-id');
+            $.post("/films/${film.id}/comments/" + commentId + "/delete", function (data) {
+                if (data.status === "success") {
+                    $('[data-comment-id="' + commentId + '"]').remove();
+                }
+            });
+        });
+
         const checkboxes = document.querySelectorAll('.seat-checkbox');
         const totalAmountElement = document.getElementById('totalAmount');
 
@@ -196,6 +239,7 @@
         });
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
